@@ -30,16 +30,58 @@ function App() {
 
     const [fileName, setFileName] = React.useState("Moo");
 
-    const [editorDimentions, setEditorDimentions] = React.useState({ width: "95vw", height: "75vh" });
+    const [editorDimentions, setEditorDimentions] = React.useState({ width: "95vw", height: "auto" });
 
     const [mode, setMode] = React.useState("Line Code");
 
     const blockCodeContainer = React.useRef(null);
 
+    const reformatTextbox = () => {
+        var content = document.getElementById("editor").innerText.replaceAll("\n", "<br />");
+        
+        var comments = content.match(/'''.*?'''/g);
+        
+        if (comments) {
+            for (var comment of comments)
+            {
+                content = content.replaceAll(comment, "<i style='color: #bcf2a2;'>" + comment + "</i>");
+            }
+        }
+
+        var parameters = content.match(/\(.*?\)/g);
+        if (parameters)
+        {
+            for (var param of parameters)
+            {
+                content = content.replaceAll(param, "<span style='color: #5cb8ff;'>" + param + "</span>");
+            }
+        }
+
+        var functionNames = content.match(/(Drive|Claw|Viper|Delay).*?\(/g);
+        if (functionNames)
+        {
+            for (var func of functionNames)
+            {
+                content = content.replaceAll(func, "<span style='color: #fff4a1;'>" + func + "</span>");
+            }
+        }
+
+        content = content.replaceAll("!", "<b style='color: #ff0000;'>!</b>");
+
+        content = content.split("<br />").map((line, index) => { return "<span style='color: #404040;' class='me-2'>.</span><span style='color: #666666; font-style: normal; ' class='me-3'>" + index + " </span><span style='color: #666666; font-style: normal; '>|</span>" + line.replace(/\.[0-9]*\s*\|?/g, "")}).join("<br />");
+
+        document.getElementsByClassName(
+            "wysiwyg-content"
+        )[0].innerHTML = content;
+    }
+
+    useEffect(() => {
+        reformatTextbox();
+    }, []);
+
     return (
-        <MDBContainer
-            fluid
-            style={{ backgroundColor: "#232323", color: "#f5f7ff" }}
+        <div
+            style={{ backgroundColor: "#232323", color: "#f5f7ff", width: "100%", height: "100%" }}
         >
             <div
                 className="d-flex justify-content-center"
@@ -192,7 +234,7 @@ function App() {
                                     "data:text/plain;charset=utf-8, " +
                                         encodeURIComponent(
                                             document.getElementById("editor")
-                                                .innerText
+                                                .innerText.replace(/\.[0-9]*\s*\|?/g, "")
                                         )
                                 );
                                 element.setAttribute("download", newFileName);
@@ -237,70 +279,66 @@ function App() {
                     <MDBTabs>
                         <MDBTabsContent>
                             <MDBTabsPane show={mode === "Line Code"}>
-                                <MDBWysiwyg
-                                    id="editor"
-                                    disableStyles
-                                    disableFormatting
-                                    disableLists
-                                    disableLinks
-                                    disableCode
-                                    style={{
-                                        height: editorDimentions.height,
-                                        width: editorDimentions.width,
-                                    }}
-                                    className="rounded-5"
+                                <div onKeyUp={() => {
+                                    const beforePos = document.getElementById("editor").selectionStart;
+                                    reformatTextbox();
+                                    document.getElementById("editor").selectionStart = beforePos;
+                                }}
                                 >
-                                    <i style={{ color: "#bcf2a2" }}>
-                                        '''<br/>
-Welcome, this is a Cowlang file <br/>
--=-=-=-=-=-| Syntax |-=-=-=-=-=- <br/>
-The Cowlang programming language is a simple, instruction-based language with the following commands.<br/>
-<br/>
-Drive.Forward(tiles, speed);<br/>
-Drive.Backward(tiles, speed);<br/>
-Drive.Left(tiles, speed);<br/>
-Drive.Right(tiles, speed);<br/>
-<br/>
-Drive.TurnLeft(tiles, speed);<br/>
-Drive.TurnRight(tiles, speed);<br/>
-<br/>
-Drive.SunnyPark(); - parks from where robot is on field rn<br/>
-<br/>
-Claw.Open();<br/>
-Claw.Close();<br/>
-<br/>
-Viper.GoTo(position);<br/>
-'''
-                                    </i>
-                                </MDBWysiwyg>
+                                    <MDBWysiwyg
+                                        id="editor"
+                                        disableStyles
+                                        disableFormatting
+                                        disableLists
+                                        disableLinks
+                                        disableCode
+                                        style={{
+                                            height: editorDimentions.height,
+                                            width: editorDimentions.width,
+                                            backgroundColor: "#404040",
+                                            textAlign: "left",
+                                        }}
+                                        className="rounded-5"
+                                    >
+                                        <i style={{ color: "#bcf2a2" }}>
+                                            '''<br/>
+    Welcome, this is a Cowlang file <br/>
+    -=-=-=-=-=-| Syntax |-=-=-=-=-=- <br/>
+    The Cowlang programming language is a simple, instruction-based language with the following commands.<br/>
+    <br/>
+    Drive.Forward(tiles, speed); - drive forwards by tiles @ speed<br/>
+    Drive.Backward(tiles, speed); - drive backwards by tiles @ speed<br/>
+    Drive.Left(tiles, speed); - drive left by tiles @ speed<br/>
+    Drive.Right(tiles, speed); - drive right by tiles @ speed<br/>
+    <br/>
+    Drive.TurnLeft(degrees, speed); - turns left by degrees @ speed<br/>
+    Drive.TurnRight(degrees, speed); - turns right by degrees @ speed<br/>
+    <br/>
+    Drive.SunnyPark(); - parks to designated zone scanned OnInit from where robot is on field rn<br/>
+    <br/>
+    Claw.Open(); - set claw to open; if already open, ignored<br/>
+    Claw.Close(); - set claw to open; if already open, ignored<br/>
+    <br/>
+    Viper.GoTo(position); - set viper to position, can be a string from [Ground, Low, Medium, High] or an integer value<br/>
+    <br/>
+    -=-=-=-=-=-| Advanced |-=-=-=-=-=- <br/>
+    Adding a ! before a function, eg !Drive.Right(tiles, speed); will make it flagged, and will not be transpiled with right-to-left.<br/>
+    '''
+                                        </i>
+                                    </MDBWysiwyg>
+                                </div>
                             </MDBTabsPane>
                             <MDBTabsPane
                                 show={mode === "Block Code"}
                             >
                               <div ref={blockCodeContainer} style={{width: "95vw", height: "75vh", backgroundColor: "#404040", borderRadius: "5px"}}>
-                              <MDBDraggable container={blockCodeContainer} style={{backgroundImage: "url(Puzzle_Comment.png)", color: "#00F990", width: 200, height: 95, borderRadius: "5px"}} >
-                                  <textarea style={{fontSize: 10, marginTop: 0, border: "1px solid", width: "100%", height: "90%", borderRadius: 5, backgroundColor: "transparent", color: "#fff"}} value={`
-Welcome, this is a Cowlang file 
+                              <MDBDraggable container={blockCodeContainer} style={{backgroundImage: "url(Puzzle_Comment.png)", color: "#00F990", width: 200, height: 90, borderRadius: "5px"}} >
+                                  <textarea style={{fontSize: 10, marginTop: 0, border: "1px solid", width: "100%", height: "90%", borderRadius: 5, backgroundColor: "transparent", color: "#fff"}} value={`Welcome, this is a Cowlang file 
 -=-=-=-=-=-| Syntax |-=-=-=-=-=-
-The Cowlang programming language is a simple, instruction-based language with the following commands.<br/>
-
-Drive.Forward(tiles, speed);
-Drive.Backward(tiles, speed);
-Drive.Left(tiles, speed);
-Drive.Right(tiles, speed);
-
-Drive.TurnLeft(tiles, speed);
-Drive.TurnRight(tiles, speed);
-
-Drive.SunnyPark(); - parks from where robot is on field rn
-
-Claw.Open();
-Claw.Close();
-
-Viper.GoTo(position);`} />
+The Cowlang programming language is a simple, instruction-based language with the following commands.<br/>`} />
                                 </MDBDraggable>
 
-                                <MDBDraggable container={blockCodeContainer} style={{backgroundImage: "url(Puzzle.png)", color: "#0056BF", width: 200, height: 95, borderRadius: "5px"}} >
+                                <MDBDraggable container={blockCodeContainer} style={{backgroundImage: "url(Puzzle.png)", color: "#0056BF", width: 200, height: 90, borderRadius: "5px"}} >
                                   <MDBRow style={{paddingTop: 20}}>
                                     <MDBCol className="ms-3">
                                       <MDBRow>
@@ -319,7 +357,7 @@ Viper.GoTo(position);`} />
                     </MDBTabs>
                 </div>
             </div>
-        </MDBContainer>
+        </div>
     );
 }
 
