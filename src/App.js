@@ -24,11 +24,15 @@ import { MDBWysiwyg } from "mdb-react-wysiwyg";
 import { MDBFileUpload } from "mdb-react-file-upload";
 import { MDBDraggable } from "mdb-react-drag-and-drop";
 
+import { Comment, MoveForwards } from "./blocks/Blocks";
+
 function App() {
     const [openFileUploadDialog, setOpenFileUploadDialog] =
         React.useState(false);
 
     const [fileName, setFileName] = React.useState("Moo");
+
+    const [blocks, setBlocks] = React.useState([]);
 
     const [editorDimentions, setEditorDimentions] = React.useState({ width: "98vw", height: "100vh", position: "absolute", top: "0", left: "0"});
 
@@ -98,7 +102,6 @@ function App() {
             }
         }
 
-
         content = content.replaceAll("!", "<b style='color: #ff0000;'>!</b>");
 
         content = content.replaceAll("?", "<b style='color: #00ff00;'>?</b>");
@@ -115,6 +118,70 @@ function App() {
     useEffect(() => {
         reformatTextbox();
     }, []);
+
+    useEffect(() => {
+        if (mode === "Block Code")
+        {
+            var lines = document.getElementById("editor").innerText.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "").replace(" ", "").replace("[FILETYPE=COWLANG]", "")
+            // var commentables = lines.replace("\n", "").split("'''");
+            lines = lines.split("\n");
+            var tobe = [];
+
+            tobe.push(<Comment container={blockCodeContainer} data={{comment: "[FILETYPE=COWLANG]"}} />);
+
+            // console.log(commentables);
+
+            // for (var i = 1; i < commentables.length; i += 2)
+            // {
+            //     if (commentables[i] !== "")
+            //     {
+            //         tobe.push(<Comment container={blockCodeContainer} data={{comment: commentables[i]}} />);
+            //     }
+            // }
+
+            var comment = "";
+
+            var inComment = false;
+            for (var i = 0; i < lines.length; i++)
+            {
+                var line = lines[i];
+
+                if (line.includes("'''")){
+                    if (inComment){
+                        inComment = false;
+                        tobe.push(<Comment container={blockCodeContainer} data={{comment: comment}} />);
+                        comment = "";
+                    }
+                    else {
+                        inComment = true;
+                    }
+                    continue;
+                }
+
+                if (inComment)
+                {
+                    comment += line;
+                    continue;
+                }
+
+                if (line.includes("Drive.Forward"))
+                {
+                    const params = line.slice(line.indexOf("(") + 1, line.lastIndexOf(")")).split(",");
+                    console.log(params);
+                    tobe.push(<MoveForwards container={blockCodeContainer} data={{tiles: Number(params[0]), speed: Number(params[1])}}/>)
+                }
+                else {
+                    if (line.replaceAll(" ", "").replaceAll(" ", "") == "")
+                    {
+                        continue;
+                    }
+                    tobe.push(<Comment container={blockCodeContainer} data={{comment: line}} />);
+                }
+            }
+
+            setBlocks(tobe);
+        }
+    }, [mode])
 
     return (
         <div
@@ -179,32 +246,6 @@ function App() {
                 </MDBModal>
 
                 <div className="text-center">
-                    {/* <MDBBtn
-                        outline
-                        color="light"
-                        style={{
-                            position: "absolute",
-                            right: 0,
-                            top: 0,
-                            height: 47,
-                            width: 150,
-                            border: "none",
-                            backgroundColor: "#404040",
-                            borderRadius: "0px",
-                        }}
-                        onClick={() => {
-                            setEditorDimentions(
-                                editorDimentions.height == "100vh"
-                                    ? { width: "95vw", height: "70vh" }
-                                    : { width: "98vw", height: "100vh", position: "absolute", top: "0", left: "0"}
-                            );
-                        }}
-                    >
-                        <MDBIcon icon="expand" className="me-2" />
-                        {editorDimentions.height == "100vh"
-                            ? "Back"
-                            : "Fullscreen"}
-                    </MDBBtn> */}
 
                     <h3 className="mb-1 mt-5">Cowlang IDE</h3>
                     <p className="mb-0 pb-0">
@@ -313,23 +354,25 @@ function App() {
 
                     <MDBTabs>
                         <MDBTabsContent>
-                            <MDBTabsPane show={mode === "Line Code"}>
+                            <MDBTabsPane show={true}>
                                 <div 
-                                onKeyDown = {(event) => {
-                                    console.log(event.code.toLowerCase());
-                                    if (!event.code.toLowerCase().includes("semicolon")){return;}
-                                    global.lastKeyDown = (new Date).getTime();
-                                    const last = global.lastKeyDown;
+                                style={{display: mode === "Line Code" ? "block" : "none"}}
+                                onMouseLeave = {(event) => {
+                                    reformatTextbox();
+                                    // console.log(event.code.toLowerCase());
+                                    // if (!event.code.toLowerCase().includes("semicolon")){return;}
+                                    // global.lastKeyDown = (new Date).getTime();
+                                    // const last = global.lastKeyDown;
 
-                                    setTimeout(() => {
-                                        if (global.lastKeyDown != last){return;}
-                                        // const beforePos = document.getElementsByClassName("wysiwyg-content")[0].selectionStart;
-                                        // const beforePos2 = document.getElementsByClassName("wysiwyg-content")[0].selectionEnd;
-                                        // console.log(beforePos);
-                                        reformatTextbox();
-                                        // document.getElementsByClassName("wysiwyg-content")[0].selectionStart = beforePos;
-                                        // document.getElementsByClassName("wysiwyg-content")[0].selectionEnd = beforePos2;
-                                    }, 100);
+                                    // setTimeout(() => {
+                                    //     if (global.lastKeyDown != last){return;}
+                                    //     // const beforePos = document.getElementsByClassName("wysiwyg-content")[0].selectionStart;
+                                    //     // const beforePos2 = document.getElementsByClassName("wysiwyg-content")[0].selectionEnd;
+                                    //     // console.log(beforePos);
+                                    //     reformatTextbox();
+                                    //     // document.getElementsByClassName("wysiwyg-content")[0].selectionStart = beforePos;
+                                    //     // document.getElementsByClassName("wysiwyg-content")[0].selectionEnd = beforePos2;
+                                    // }, 100);
                                 }}
                                 >
                                     <MDBWysiwyg
@@ -340,35 +383,38 @@ function App() {
                                         disableLinks
                                         disableCode
                                         style={{
-                                            height: editorDimentions.height,
-                                            width: editorDimentions.width,
+                                            height: "auto",
+                                            width: "98vw",
                                             backgroundColor: "#404040",
                                             textAlign: "left",
                                         }}
                                         className="rounded-5"
                                     >
-                                        <i style={{ color: "#bcf2a2" }}>[FILETYPE=COWLANG]<br/>'''<br/>Welcome, this is a Cowlang file <br/>
--=-=-=-=-=-| Syntax |-=-=-=-=-=- <br/>
-The Cowlang programming language is a simple, instruction-based language with the following commands.<br/>
+                                        <i style={{ color: "#bcf2a2" }}>
+[FILETYPE=COWLANG] <br/>
+''' <br/>
+Welcome, this is a Cowlang file  <br/>
+-=-=-=-=-=-| Syntax |-=-=-=-=-=-  <br/>
+The Cowlang programming language is a simple, instruction-based language with the following commands. <br/>
 <br/>
-Drive.Forward(tiles, speed); - drive forwards by tiles @ speed<br/>
-Drive.Backward(tiles, speed); - drive backwards by tiles @ speed<br/>
-Drive.Left(tiles, speed); - drive left by tiles @ speed<br/>
-Drive.Right(tiles, speed); - drive right by tiles @ speed<br/>
+Drive.Forward(tiles, speed); - drive forwards by tiles [1, 50] @ speed [0, 100] % <br/>
+Drive.Backward(tiles, speed); - drive backwards by tiles [1, 50]  @ speed [0, 100] % <br/>
+Drive.Left(tiles, speed); - drive left by tiles [1, 50]  @ speed [0, 100] % <br/>
+Drive.Right(tiles, speed); - drive right by tiles [1, 50]  @ speed [0, 100] % <br/>
 <br/>
-Drive.TurnLeft(degrees, speed); - turns left by degrees @ speed<br/>
-Drive.TurnRight(degrees, speed); - turns right by degrees @ speed<br/>
+Drive.TurnLeft(degrees, speed); - turns left by degrees  @ speed [0, 100] % <br/>
+Drive.TurnRight(degrees, speed); - turns right by degrees  @ speed [0, 100] % <br/>
 <br/>
-Drive.SunnyPark(); - parks to designated zone scanned OnInit from where robot is on field rn<br/>
+Drive.SunnyPark(speed); - parks to designated zone scanned OnInit from where robot is on field rn   @ speed [0, 100] % <br/>
 <br/>
-Claw.Open(); - set claw to open; if already open, ignored<br/>
-Claw.Close(); - set claw to open; if already open, ignored<br/>
+Claw.Open(); - set claw to open; if already open, ignored <br/>
+Claw.Close(); - set claw to open; if already open, ignored <br/>
 <br/>
-Viper.GoTo(position); - set viper to position, can be a string from [Ground, Low, Medium, High] or an integer value<br/>
+Viper.GoTo(position); - set viper to position, can be a string from [Ground, Low, Medium, High] or an integer value <br/>
 <br/>
--=-=-=-=-=-| Advanced |-=-=-=-=-=- <br/>
-Adding a ! before a function, eg !Drive.Right(tiles, speed); will make it flagged, and will not be transpiled with right-to-left.<br/>
-Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in a separate thread. (will run next command with current)<br/>
+-=-=-=-=-=-| Advanced |-=-=-=-=-=-  <br/>
+Adding a ! before a function, eg !Drive.Right(tiles, speed); will make it flagged, and will not be transpiled with right-to-left. <br/>
+Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in a separate thread. (will run next command with current) <br/>
 '''
                                         </i>
                                     </MDBWysiwyg>
@@ -377,27 +423,9 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                             <MDBTabsPane
                                 show={mode === "Block Code"}
                             >
-                              <section ref={blockCodeContainer} style={{height: "100vh", width: "98vw", backgroundColor: "#404040", borderRadius: "5px"}}>
-                              <MDBDraggable container={blockCodeContainer} style={{backgroundImage: "url(Puzzle_Comment.png)", color: "#00F990", width: 200, height: 90, borderRadius: "5px"}} >
-                                  <textarea style={{fontSize: 10, marginTop: 0, border: "1px solid", width: "100%", height: "90%", borderRadius: 5, backgroundColor: "transparent", color: "#fff"}} value={`Welcome, this is a Cowlang file 
--=-=-=-=-=-| Syntax |-=-=-=-=-=-
-The Cowlang programming language is a simple, instruction-based language with the following commands.<br/>`} />
-                                </MDBDraggable>
-
-                                <MDBDraggable container={blockCodeContainer} style={{backgroundImage: "url(Puzzle.png)", color: "#0056BF", width: 200, height: 90, borderRadius: "5px"}} >
-                                  <MDBRow style={{paddingTop: 20}}>
-                                    <MDBCol className="ms-3">
-                                      <MDBRow>
-                                        <MDBIcon icon="long-arrow-alt-up" />
-                                        <p>Forward</p>
-                                      </MDBRow>
-                                    </MDBCol>
-                                    <MDBCol className="me-5">
-                                     <input type="number" style={{border: "none", width: 40, height: 40, marginTop: 0, borderRadius: 5, border: "1px solid #fff", color: "#fff", backgroundColor: "transparent"}}/>
-                                    </MDBCol>
-                                  </MDBRow>
-                                </MDBDraggable>
-                              </section>
+                                {mode === "Block Code" && <section ref={blockCodeContainer} style={{height: "100vh", width: "98vw", backgroundColor: "#404040", borderRadius: "5px"}}>
+                                    {blocks}
+                              </section>}
                             </MDBTabsPane>
                         </MDBTabsContent>
                     </MDBTabs>
