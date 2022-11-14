@@ -1,19 +1,22 @@
 {
   "name": "mdb-react-template",
   "version": "5.0.0",
+  "homepage": "https://RPS-Argonauts-FTC.github.io/Cowlang-IDE",
   "description": "template for mdb-react-ui-kit",
   "private": true,
   "dependencies": {
+    "mdb-react-drag-and-drop": "./plugins/drag-and-drop.tgz",
+    "mdb-react-file-upload": "./plugins/file-upload.tgz",
+    "mdb-react-ui-kit": "./mdb-react-ui-kit-5.0.0.tgz",
+    "mdb-react-wysiwyg": "./plugins/wysiwyg-editor.tgz",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4",
-    "mdb-react-ui-kit": "./mdb-react-ui-kit-5.0.0.tgz",
-    "mdb-react-wysiwyg": "./plugins/wysiwyg-editor.tgz",
-    "mdb-react-file-upload": "./plugins/file-upload.tgz",
-    "mdb-react-drag-and-drop": "./plugins/drag-and-drop.tgz"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
+   "predeploy": "npm run build",
+   "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -36,5 +39,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^4.0.0"
   }
 }

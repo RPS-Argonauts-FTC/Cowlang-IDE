@@ -68,7 +68,13 @@ function App() {
 
         content = content.replaceAll("!", "<b style='color: #ff0000;'>!</b>");
 
-        content = content.split("<br />").map((line, index) => { return "<span style='color: #404040;' class='me-2'>.</span><span style='color: #666666; font-style: normal; ' class='me-3'>" + index + " </span><span style='color: #666666; font-style: normal; '>|</span>" + line.replace(/\.[0-9]*\s*\|?/g, "")}).join("<br />");
+        content = content.replaceAll("?", "<b style='color: #00ff00;'>?</b>");
+
+        content = content.replaceAll("Forwards", "Forward").replaceAll("Backwards", "Backward");
+
+        content = content.replaceAll("(", "<b style='color: #a834eb;'>(</b>").replaceAll(")", "<b style='color: #a834eb;'>)</b>");
+
+        content = content.split("<br />").map((line, index) => { return "<span style='color: #404040;' class='me-2'>|||</span><span style='color: #666666; font-style: normal; ' class='me-3'>" + index + " </span><span style='color: #666666; font-style: normal; '>|</span>" + line.replace(/\|\|\|[0-9]*\s*\|?/g, "")}).join("<br />");
 
         document.getElementsByClassName(
             "wysiwyg-content"
@@ -142,7 +148,7 @@ function App() {
                 </MDBModal>
 
                 <div className="text-center">
-                    {/* <MDBBtn
+                    <MDBBtn
                         outline
                         color="light"
                         style={{
@@ -157,21 +163,17 @@ function App() {
                         }}
                         onClick={() => {
                             setEditorDimentions(
-                                editorDimentions.width != "95vw"
+                                editorDimentions.height == "100vh"
                                     ? { width: "95vw", height: "70vh" }
-                                    : {
-                                          width: "60vw",
-                                          height: "60vh",
-                                      }
+                                    : { width: "98vw", height: "100vh", position: "absolute", top: "0", left: "0"}
                             );
                         }}
                     >
                         <MDBIcon icon="expand" className="me-2" />
-                        {editorDimentions.width == "95vw"
-                            ? "Shrink"
-                            : "Expand"}{" "}
-                        IDE
-                    </MDBBtn> */}
+                        {editorDimentions.height == "100vh"
+                            ? "Back"
+                            : "Fullscreen"}
+                    </MDBBtn>
 
                     <h3 className="mb-1 mt-5">Cowlang IDE</h3>
                     <p className="mb-0 pb-0">
@@ -196,7 +198,7 @@ function App() {
                             style={{
                                 position: "absolute",
                                 top: 0,
-                                left: 240,
+                                left: 280,
                                 height: 47,
                                 border: "none",
                                 backgroundColor: "#404040",
@@ -216,7 +218,7 @@ function App() {
                             style={{
                                 position: "absolute",
                                 top: 0,
-                                left: 380,
+                                left: 420,
                                 height: 47,
                                 border: "none",
                                 backgroundColor: "#404040",
@@ -234,7 +236,7 @@ function App() {
                                     "data:text/plain;charset=utf-8, " +
                                         encodeURIComponent(
                                             document.getElementById("editor")
-                                                .innerText.replace(/\.[0-9]*\s*\|?/g, "")
+                                                .innerText.replace(/\|\|\|[0-9]*\s*\|?/g, "")
                                         )
                                 );
                                 element.setAttribute("download", newFileName);
@@ -259,6 +261,7 @@ function App() {
                                 }}
                                 active={mode === "Line Code"}
                             >
+                                <MDBIcon icon="code" className="me-2" />
                                 Line Code
                             </MDBTabsLink>
                         </MDBTabsItem>
@@ -271,6 +274,7 @@ function App() {
                                 }}
                                 active={mode === "Block Code"}
                             >
+                                <MDBIcon icon="th-large" className="me-2" />
                                 Block Code
                             </MDBTabsLink>
                         </MDBTabsItem>
@@ -279,7 +283,7 @@ function App() {
                     <MDBTabs>
                         <MDBTabsContent>
                             <MDBTabsPane show={mode === "Line Code"}>
-                                <div onKeyUp={() => {
+                                <div onMouseLeave={() => {
                                     const beforePos = document.getElementById("editor").selectionStart;
                                     reformatTextbox();
                                     document.getElementById("editor").selectionStart = beforePos;
@@ -323,6 +327,7 @@ function App() {
     <br/>
     -=-=-=-=-=-| Advanced |-=-=-=-=-=- <br/>
     Adding a ! before a function, eg !Drive.Right(tiles, speed); will make it flagged, and will not be transpiled with right-to-left.<br/>
+    Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in a separate thread. (will run next command with current)<br/>
     '''
                                         </i>
                                     </MDBWysiwyg>
@@ -331,8 +336,8 @@ function App() {
                             <MDBTabsPane
                                 show={mode === "Block Code"}
                             >
-                              <div ref={blockCodeContainer} style={{width: "95vw", height: "75vh", backgroundColor: "#404040", borderRadius: "5px"}}>
-                              <MDBDraggable container={blockCodeContainer} style={{backgroundImage: "url(Puzzle_Comment.png)", color: "#00F990", width: 200, height: 90, borderRadius: "5px"}} >
+                              <div ref={blockCodeContainer} style={{height: editorDimentions.height, width: editorDimentions.width, backgroundColor: "#404040", borderRadius: "5px"}}>
+                              <MDBDraggable container={blockCodeContainer} style={{backgroundImage: "url('Puzzle_Comment.png')", color: "#00F990", width: 200, height: 90, borderRadius: "5px"}} >
                                   <textarea style={{fontSize: 10, marginTop: 0, border: "1px solid", width: "100%", height: "90%", borderRadius: 5, backgroundColor: "transparent", color: "#fff"}} value={`Welcome, this is a Cowlang file 
 -=-=-=-=-=-| Syntax |-=-=-=-=-=-
 The Cowlang programming language is a simple, instruction-based language with the following commands.<br/>`} />
