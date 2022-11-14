@@ -121,13 +121,12 @@ function App() {
 
     useEffect(() => {
         if (mode === "Block Code")
-        {
-            var lines = document.getElementById("editor").innerText.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "").replace(" ", "").replace("[FILETYPE=COWLANG]", "")
-            // var commentables = lines.replace("\n", "").split("'''");
-            lines = lines.split("\n");
+        {    
+            var lines = document.getElementById("editor").innerText.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "<br/>").replace(" ", "").replace("[FILETYPE=COWLANG]", "").split("<br/>");
+
             var tobe = [];
 
-            tobe.push(<Comment container={blockCodeContainer} data={{comment: "[FILETYPE=COWLANG]"}} />);
+            // tobe.push(<Comment container={blockCodeContainer} data={{comment: "[FILETYPE=COWLANG]"}} />);
 
             // console.log(commentables);
 
@@ -146,13 +145,17 @@ function App() {
             {
                 var line = lines[i];
 
+                console.log(line)
+
                 if (line.includes("'''")){
                     if (inComment){
+                        console.log("exit at " + i);
                         inComment = false;
                         tobe.push(<Comment container={blockCodeContainer} data={{comment: comment}} />);
                         comment = "";
                     }
                     else {
+                        console.log("enter at " + i);
                         inComment = true;
                     }
                     continue;
@@ -179,6 +182,8 @@ function App() {
                 }
             }
 
+            console.log(tobe);
+
             setBlocks(tobe);
         }
     }, [mode])
@@ -192,7 +197,7 @@ function App() {
                 style={{ height: "100vh" }}
             >
                 <MDBModal
-                    dark
+                    // dark
                     show={openFileUploadDialog}
                     setShow={setOpenFileUploadDialog}
                 >
@@ -423,7 +428,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                             <MDBTabsPane
                                 show={mode === "Block Code"}
                             >
-                                {mode === "Block Code" && <section ref={blockCodeContainer} style={{height: "100vh", width: "98vw", backgroundColor: "#404040", borderRadius: "5px"}}>
+                                {mode === "Block Code" && <section ref={blockCodeContainer} style={{height: "10000px", width: "98vw", backgroundColor: "#404040", borderRadius: "5px"}}>
                                     {blocks}
                               </section>}
                             </MDBTabsPane>

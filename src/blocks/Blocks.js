@@ -25,7 +25,7 @@ import { MDBDraggable } from "mdb-react-drag-and-drop";
 const blockBackgroundURL =
     "url('https://media.discordapp.net/attachments/1018552807508410409/1041781682317033532/Rectangle_9-3.png')";
 const commentBlockBackgroundURL =
-    "url('https://media.discordapp.net/attachments/1018552807508410409/1041782459823566878/Rectangle_10-3.png')";
+    "url('https://media.discordapp.net/attachments/1018552807508410409/1041826366745759754/Puzzle_Comment.png')";
 
 const Drag = ({container, url = blockBackgroundURL, ...props}) => {
 
@@ -54,7 +54,7 @@ const Drag = ({container, url = blockBackgroundURL, ...props}) => {
                     width: 300,
                     height: 94,
                     borderRadius: "5px",
-                    backgroundColor: "rgba(255, 255, 255, 0.25)",
+                    // backgroundColor: "rgba(255, 255, 255, 0.25)",
                     overflow: "show"
                 }}
             >
@@ -89,15 +89,15 @@ export const MoveForwards = ({ container, data = { tiles: 1, speed: 100 } }) => 
                         type="number"
                         min={1}
                         max={50}
-                        value={data.tiles}
+                        defaultValue={data.tiles}
                         style={{
-                            border: "1px solid #404040",
+                            border: "none",
+                            backgroundColor: "rgba(255, 255, 255, 0.5)",
                             width: 40,
                             height: 40,
                             marginTop: -10,
                             borderRadius: 5,
                             color: "#404040",
-                            backgroundColor: "transparent",
                         }}
                     />
                 </MDBCol>
@@ -107,15 +107,15 @@ export const MoveForwards = ({ container, data = { tiles: 1, speed: 100 } }) => 
                         type="number"
                         min={0}
                         max={100}
-                        value={data.speed}
+                        defaultValue={data.speed}
                         style={{
-                            border: "1px solid #404040",
+                            border: "none",
                             width: 40,
                             height: 40,
                             marginTop: -10,
                             borderRadius: 5,
                             color: "#404040",
-                            backgroundColor: "transparent",
+                            backgroundColor: "rgba(255, 255, 255, 0.5)",
                         }}
                     />
                 </MDBCol>
@@ -141,10 +141,10 @@ export const Comment = ({ container, data = { comment: "" } }) => {
                     minWidth: "90%",
                     height: 55,
                     borderRadius: 5,
-                    backgroundColor: "transparent",
-                    color: "#bcf2a2",
+                    backgroundColor: "rgba(255, 255, 255, 0.5)",
+                    color: "#000",
                 }}
-                value={data.comment}
+                defaultValue={data.comment}
             />
         </Drag>
     );
