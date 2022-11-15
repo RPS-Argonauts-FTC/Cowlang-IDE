@@ -130,7 +130,7 @@ function App() {
                 tobe.push(<ViperGoTo container={blockCodeContainer} data={{pos: params[0]}}/>)
             }
             else {
-                if (line.replaceAll(" ", "").replaceAll(" ", "") == "")
+                if (line.replaceAll(" ", "").replaceAll(" ", "").replaceAll("\n") == "")
                 {
                     continue;
                 }
@@ -231,6 +231,9 @@ function App() {
         {
             reformatBlocks();
         }
+        else {
+            reformatTextbox();
+        }
     }, [mode]);
 
     return (
@@ -275,6 +278,7 @@ function App() {
                                                 document.getElementsByClassName(
                                                     "wysiwyg-content"
                                                 )[0].innerText = read.result;
+                                                setMode("Line Code");
                                                 setOpenFileUploadDialog(false);
                                             };
                                         }}
@@ -404,7 +408,7 @@ Claw.Close();
 
 Viper.GoTo(High);
                                 `;
-                                reformatTextbox();
+                                setMode("Line Code");
                             }}
                         >
                             <MDBIcon icon="upload" className="me-2" />
