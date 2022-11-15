@@ -28,7 +28,7 @@ import { MDBWysiwyg } from "mdb-react-wysiwyg";
 import { MDBFileUpload } from "mdb-react-file-upload";
 import { MDBDraggable } from "mdb-react-drag-and-drop";
 
-import { ClawClose, ClawOpen, Comment, MoveBackwards, MoveForwards, MoveLeft, MoveRight, SunnyPark, TurnLeft, TurnRight, ViperGoTo } from "./blocks/Blocks";
+import { ClawClose, ClawOpen, Comment, MoveBackwards, MoveForwards, MoveLeft, MoveRight, SunnyPark, TurnLeft, TurnRight, ViperGoTo, Delay } from "./blocks/Blocks";
 
 function App() {
     const [openFileUploadDialog, setOpenFileUploadDialog] =
@@ -37,6 +37,13 @@ function App() {
     const [fileName, setFileName] = React.useState("Moo");
 
     const [blocks, setBlocks] = React.useState([]);
+
+    global.blocks = blocks;
+    global.setBlocks = setBlocks;
+
+    useEffect(() => {
+        global.blocks = blocks;
+    }, [blocks]);
 
     const [editorDimentions, setEditorDimentions] = React.useState({ width: "98vw", height: "100vh", position: "absolute", top: "0", left: "0"});
 
@@ -47,7 +54,7 @@ function App() {
     const blockCodeContainer = React.useRef(null);
 
     const reformatBlocks = () => {
-        var lines = document.getElementById("editor").innerText.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "<br/>").replace(" ", "").split("<br/>");
+        var lines = document.getElementById("editor").innerText.replace(/   [0-9]*\s*   ?/g, "<br/>").replace(" ", "").split("<br/>");
 
         var tobe = [];
 
@@ -70,17 +77,15 @@ function App() {
         {
             var line = lines[i];
 
-            console.log(line)
-
             if (line.includes("/*") || line.includes("*/")){
                 if (inComment){
-                    console.log("exit at " + i);
+                    // console.log("exit at " + i);
                     inComment = false;
                     tobe.push(<Comment container={blockCodeContainer} data={{comment: comment}} />);
                     comment = "";
                 }
                 else {
-                    console.log("enter at " + i);
+                    // console.log("enter at " + i);
                     inComment = true;
                 }
                 continue;
@@ -123,28 +128,85 @@ function App() {
             }
             else if (line.includes("Claw.Open"))
             {
-                tobe.push(<ClawOpen container={blockCodeContainer}/>)
+                tobe.push(<ClawOpen container={blockCodeContainer} data={{}}/>)
             }
             else if (line.includes("Claw.Close"))
             {
-                tobe.push(<ClawClose container={blockCodeContainer}/>)
+                tobe.push(<ClawClose container={blockCodeContainer} data={{}}/>)
             }
             else if (line.includes("Viper.GoTo"))
             {
                 tobe.push(<ViperGoTo container={blockCodeContainer} data={{pos: params[0]}}/>)
             }
+            else if (line.includes("Delay"))
+            {
+                tobe.push(<Delay container={blockCodeContainer} data={{seconds: params[0]}}/>)
+            }
             else {
-                if (line.replaceAll(" ", "").replaceAll(" ", "").replaceAll("\n", "") == "")
+                const unable = line.replace(" ", "").replace(" ", "").replace("\n", "").replace("↵", "").replace(" ", "");
+                if (unable == "" || Number(unable) != NaN)
                 {
                     continue;
                 }
+                console.log(unable);
                 tobe.push(<Comment container={blockCodeContainer} data={{comment: line}} />);
             }
         }
 
-        console.log(tobe);
+        // console.log(tobe);
 
         setBlocks(tobe);
+    };
+
+    const recalculateTextbox = () => {
+        var content = "";
+
+        for (var block of blocks)
+        {
+            var data = block.props.data;
+
+            console.log(data);
+
+            if (data.blockType === "Comment")
+            {
+                content += "/*\n" + data.comment + "*/\n";
+                continue;
+            }
+
+            if (data.blockType.includes("Drive.Turn")){
+                content += data.blockType + "(" + data.degrees + ", " + data.speed + ");\n";
+                continue;
+            }
+
+            if (data.blockType.includes("Drive.SunnyPark")){
+                content += data.blockType + "(" + data.speed + ");\n";
+                continue;
+            }
+
+            if (data.blockType.includes("Drive")){
+                content += data.blockType + "(" + data.tiles + ", " + data.speed + ");\n";
+                continue;
+            }
+
+            if (data.blockType.includes("Claw")){
+                content += data.blockType + "();\n";
+                continue;
+            }
+
+            if (data.blockType.includes("Viper")){
+                content += data.blockType + "(" + data.pos + ");\n";
+                continue;
+            }
+
+            if (data.blockType.includes("Delay")){
+                content += data.blockType + "(" + data.seconds + ");\n";
+                continue;
+            }
+        }
+
+        document.getElementsByClassName(
+            "wysiwyg-content"
+        )[0].innerText = content;
     };
 
     const reformatTextbox = () => {
@@ -152,7 +214,7 @@ function App() {
 
         content = content.replaceAll("\n", "<br />");
 
-        content = content.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "")
+        content = content.replace(/   [0-9]*\s*   ?/g, "")
 
         // content = content.replaceAll(/.*\[FILETYPE\=COWLANG]/g, "<b style='color: #ff6347;'>[FILETYPE=COWLANG]</b>");
 
@@ -176,7 +238,6 @@ function App() {
         {
             for (var param of parameters)
             {
-                // console.log(param);
                 content = content.replaceAll(param, "<b style='color: #5cb8ff;'>" + param + "</b>");
             }
         }
@@ -201,6 +262,7 @@ function App() {
                     "Claw.Close",
 
                     "Viper.GoTo",
+                    "Delay",
                 ])
                 {
                     if (func.includes(actualFunctions))
@@ -219,7 +281,7 @@ function App() {
 
         content = content.replaceAll("(", "<b style='color: #a834eb;'>(</b>").replaceAll(")", "<b style='color: #a834eb;'>)</b>");
 
-        content = content.split("<br />").map((line, index) => { return "<span style='color: #404040;' class='me-0'>|||</span><span style='color: #666666; font-style: normal; ' class='me-3'>" + index + " </span><span style='color: #404040;' class='me-4'>|||</span>" + line}).join("<br />");
+        content = content.split("<br />").map((line, index) => { return "<span class='me-0'>   </span><span style='color: #666666; font-style: normal; ' class='me-3'>" + index + " </span><span class='me-4'>   </span>" + line}).join("<br />");
 
         document.getElementsByClassName(
             "wysiwyg-content"
@@ -236,6 +298,7 @@ function App() {
             reformatBlocks();
         }
         else {
+            recalculateTextbox();
             reformatTextbox();
         }
     }, [mode]);
@@ -303,7 +366,7 @@ function App() {
                     </MDBModalDialog>
                 </MDBModal>
 
-                <div className="text-center">
+                <div className="text-center mt-2">
 
                     <h3 className="mb-1 mt-5">Cowlang IDE</h3>
                     <p className="mb-0 pb-0">
@@ -366,7 +429,7 @@ function App() {
                                     "data:text/plain;charset=utf-8, " +
                                         encodeURIComponent(
                                             document.getElementById("editor")
-                                                .innerText.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "\n")
+                                                .innerText.replace(/   [0-9]*\s*   ?/g, "\n")
                                         )
                                 );
                                 element.setAttribute("download", newFileName);
@@ -396,6 +459,9 @@ function App() {
                                 document.getElementsByClassName(
                                     "wysiwyg-content"
                                 )[0].innerText = `
+/*
+Keep this comment here, good for formatting.
+*/
 Drive.Forward(1, 100);
 Drive.Backward(1, 100);
 
@@ -411,12 +477,37 @@ Claw.Open();
 Claw.Close();
 
 Viper.GoTo(High);
-                                `;
+
+Delay(1);`;
                                 setMode("Line Code");
                             }}
                         >
                             <MDBIcon icon="upload" className="me-2" />
                             Load Sample
+                        </MDBBtn>
+                        <MDBBtn
+                            outline
+                            className="me-2"
+                            color="link"
+                            style={{
+                                position: "absolute",
+                                top: 50,
+                                left: 0,
+                                height: 50,
+                                border: "none",
+                                // backgroundColor: "#404040",
+                                color: "red",
+                                borderRadius: "0px",
+                            }}
+                            onClick={() => {
+                                document.getElementsByClassName(
+                                    "wysiwyg-content"
+                                )[0].innerText = `/*\nKeep this comment here, good for formatting.\n*/`;
+                                setMode("Line Code");
+                            }}
+                        >
+                            <MDBIcon icon="times" className="me-2" />
+                            Clear
                         </MDBBtn>
                     </MDBContainer>
 
@@ -523,17 +614,31 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                 {mode === "Block Code" && <section ref={blockCodeContainer} style={{height: "10000px", width: "98vw", backgroundColor: "#404040", borderRadius: "5px"}}>
                                     {blocks}
                               </section>}
-                              <MDBDropdown dropup group>
-                                <MDBDropdownToggle style={{position: "fixed", right: 25, bottom: 25, borderRadius: 100, width: 0, height: 0, backgroundColor: "#404040"}}></MDBDropdownToggle>
-                                <MDBDropdownMenu alwaysOpen dark style={{borderRadius: 10}}>
-                                    <MDBDropdownItem header>
-                                        Blocks
+                              {mode === "Block Code" && <MDBDropdown className='shadow-0' style={{position: "fixed", right: 125, top: 25}}>
+                                <MDBDropdownMenu alwaysOpen style={{borderRadius: 10}}>
+                                    <MDBDropdownItem link onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<Comment container={blockCodeContainer} data={{comment: ""}} />);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Comment
+                                    </MDBDropdownItem>
+                                    <MDBDropdownItem link onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<Delay container={blockCodeContainer} data={{seconds: 1}}/>);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Delay
                                     </MDBDropdownItem>
                                     <MDBDropdownItem divider />
                                     <MDBDropdownItem link onClick={
                                         () => {
                                             const newBlocks = [...blocks];
-                                            newBlocks.push(<MoveForwards container={blockCodeContainer} />);
+                                            newBlocks.push(<MoveForwards container={blockCodeContainer} data={{tiles: 1, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
@@ -542,7 +647,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                     <MDBDropdownItem link onClick={
                                         () => {
                                             const newBlocks = [...blocks];
-                                            newBlocks.push(<MoveBackwards container={blockCodeContainer} />);
+                                            newBlocks.push(<MoveBackwards container={blockCodeContainer} data={{tiles: 1, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
@@ -551,7 +656,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                     <MDBDropdownItem link onClick={
                                         () => {
                                             const newBlocks = [...blocks];
-                                            newBlocks.push(<MoveLeft container={blockCodeContainer} />);
+                                            newBlocks.push(<MoveLeft container={blockCodeContainer} data={{tiles: 1, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
@@ -560,7 +665,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                     <MDBDropdownItem link onClick={
                                         () => {
                                             const newBlocks = [...blocks];
-                                            newBlocks.push(<MoveRight container={blockCodeContainer} />);
+                                            newBlocks.push(<MoveRight container={blockCodeContainer} data={{tiles: 1, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
@@ -570,7 +675,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                     <MDBDropdownItem link onClick={
                                         () => {
                                             const newBlocks = [...blocks];
-                                            newBlocks.push(<TurnLeft container={blockCodeContainer} />);
+                                            newBlocks.push(<TurnLeft container={blockCodeContainer} data={{degrees: 90, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
@@ -579,7 +684,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                     <MDBDropdownItem link  onClick={
                                         () => {
                                             const newBlocks = [...blocks];
-                                            newBlocks.push(<TurnRight container={blockCodeContainer} />);
+                                            newBlocks.push(<TurnRight container={blockCodeContainer} data={{degrees: 90, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
@@ -589,7 +694,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                     <MDBDropdownItem link  onClick={
                                         () => {
                                             const newBlocks = [...blocks];
-                                            newBlocks.push(<SunnyPark container={blockCodeContainer} />);
+                                            newBlocks.push(<SunnyPark container={blockCodeContainer} data={{speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
@@ -599,7 +704,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                     <MDBDropdownItem link onClick={
                                         () => {
                                             const newBlocks = [...blocks];
-                                            newBlocks.push(<ClawOpen container={blockCodeContainer} />);
+                                            newBlocks.push(<ClawOpen container={blockCodeContainer} data={{}} />);
                                             setBlocks(newBlocks);
                                         }
                                     }>
@@ -608,7 +713,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                     <MDBDropdownItem link onClick={
                                         () => {
                                             const newBlocks = [...blocks];
-                                            newBlocks.push(<ClawClose container={blockCodeContainer} />);
+                                            newBlocks.push(<ClawClose container={blockCodeContainer} data={{}} />);
                                             setBlocks(newBlocks);
                                         }
                                     }>
@@ -618,14 +723,14 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                     <MDBDropdownItem link onClick={
                                         () => {
                                             const newBlocks = [...blocks];
-                                            newBlocks.push(<ViperGoTo container={blockCodeContainer} />);
+                                            newBlocks.push(<ViperGoTo container={blockCodeContainer} data={{pos: "High"}} />);
                                             setBlocks(newBlocks);
                                         }
                                     }>
                                         Viper Go To
                                     </MDBDropdownItem>
                                 </MDBDropdownMenu>
-                              </MDBDropdown>
+                              </MDBDropdown>}
                             </MDBTabsPane>
                         </MDBTabsContent>
                     </MDBTabs>

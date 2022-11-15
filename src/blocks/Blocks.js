@@ -33,12 +33,42 @@ const clawBlockBackgroundURL =
 const viperBlockBackgroundURL =
     "url('https://media.discordapp.net/attachments/1018552807508410409/1041926786105217124/Rectangle_13.png')";
 
-const Drag = ({container, url = blockBackgroundURL, ...props}) => {
+var uuid = require("uuid");
+
+const getUniqueID = () => {
+    const id = String(uuid.v4());
+
+    for (var block of global.blocks)
+    {
+        if (block.props.data.id === id)
+        {
+            return getUniqueID();
+        }
+    }
+
+    return id;
+}
+
+const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
 
     const [close, setClosed] = React.useState(false);
 
     if (close)
     {
+        const target = data.idx;
+
+        const IDArray = global.blocks.map((block) => block.props.data.idx);
+
+        const indexToRemove = IDArray.indexOf(target);
+        let newBlocks = global.blocks;
+
+        if (indexToRemove > -1)
+        {
+            newBlocks.splice(indexToRemove, 1);
+        }
+
+        global.setBlocks(newBlocks);
+
         return null;
     }
 
@@ -48,7 +78,7 @@ const Drag = ({container, url = blockBackgroundURL, ...props}) => {
 
             }}
             onMouseDown={() => {
-                console.log("down")
+                // console.log("down")
             }}
         >
             <MDBDraggable
@@ -73,7 +103,7 @@ const Drag = ({container, url = blockBackgroundURL, ...props}) => {
     );
 }
 
-const MoveBlockTemplate = ({ direction, inputLabel = ["Tiles", "% Speed"], icon = null, container, data = { param1: 1, param2: 1 } }) => {
+const MoveBlockTemplate = ({ direction, inputLabel = ["Tiles", "% Speed"], icon = null, container, data = { param1: 1, param2: 1 }, onChange = () => {} }) => {
 
     if (icon == null)
     {
@@ -82,6 +112,7 @@ const MoveBlockTemplate = ({ direction, inputLabel = ["Tiles", "% Speed"], icon 
 
     return (
         <Drag
+            data={data}
             container={container}
         >
             <MDBRow style={{ paddingTop: 6 }}>
@@ -102,6 +133,10 @@ const MoveBlockTemplate = ({ direction, inputLabel = ["Tiles", "% Speed"], icon 
                         min={1}
                         max={50}
                         defaultValue={data.param1}
+                        onChange={(e) => {
+                            data.param1 = e.target.value;
+                            onChange(data);
+                        }}
                         style={{
                             border: "none",
                             backgroundColor: "rgba(255, 255, 255, 0.5)",
@@ -120,6 +155,10 @@ const MoveBlockTemplate = ({ direction, inputLabel = ["Tiles", "% Speed"], icon 
                         min={0}
                         max={100}
                         defaultValue={data.param2}
+                        onChange={(e) => {
+                            data.param2 = e.target.value;
+                            onChange(data);
+                        }}
                         style={{
                             border: "none",
                             width: 40,
@@ -137,62 +176,115 @@ const MoveBlockTemplate = ({ direction, inputLabel = ["Tiles", "% Speed"], icon 
 };
 
 export const MoveForwards = ({ container, data = { tiles: 1, speed: 100 } }) => {
+    data.blockType = "Drive.Forward";
+    data.idx = getUniqueID();
+
     return (
         <MoveBlockTemplate direction={"Forward"} container={container} data={{
             param1: data.tiles,
-            param2: data.speed
-        }} />
+            param2: data.speed,
+            idx: data.idx
+        }} 
+        onChange={(e) => {
+            data.tiles = e.param1;
+            data.speed = e.param2;
+        }}
+        />
     );
 };
 
 export const MoveBackwards = ({ container, data = { tiles: 1, speed: 100 } }) => {
+    data.blockType= "Drive.Backward";
+    data.idx = getUniqueID();
+
     return (
         <MoveBlockTemplate direction={"Backward"} container={container} data={{
             param1: data.tiles,
-            param2: data.speed
+            param2: data.speed,
+            idx: data.idx
+        }}
+        onChange={(e) => {
+            data.tiles = e.param1;
+            data.speed = e.param2;
         }} />
     );
 };
 
 export const MoveLeft = ({ container, data = { tiles: 1, speed: 100 } }) => {
+    data.blockType= "Drive.Left";
+    data.idx = getUniqueID();
+
     return (
         <MoveBlockTemplate direction={"Left"} container={container} data={{
             param1: data.tiles,
-            param2: data.speed
-        }} />
+            param2: data.speed,
+            idx: data.idx
+        }} 
+        onChange={(e) => {
+            data.tiles = e.param1;
+            data.speed = e.param2;
+        }}/>
     );
 };
 
 export const MoveRight = ({ container, data = { tiles: 1, speed: 100 } }) => {
+    data.blockType= "Drive.Right";
+    data.idx = getUniqueID();
+
     return (
         <MoveBlockTemplate direction={"Right"} container={container} data={{
             param1: data.tiles,
-            param2: data.speed
-        }} />
+            param2: data.speed,
+            idx: data.idx
+        }} 
+        onChange={(e) => {
+            data.tiles = e.param1;
+            data.speed = e.param2;
+        }}/>
     );
 };
 
 export const TurnLeft = ({ container, data = { degrees: 90, speed: 100 } }) => {
+    data.blockType= "Drive.TurnLeft";
+    data.idx = getUniqueID();
+
     return (
         <MoveBlockTemplate direction={"Turn Left"} container={container} data={{
             param1: data.degrees,
-            param2: data.speed
-        }} inputLabel={["Degrees", "% Speed"]} icon="undo" />
+            param2: data.speed,
+            idx: data.idx
+        }} inputLabel={["Degrees", "% Speed"]} icon="undo" 
+        onChange={(e) => {
+            data.degrees = e.param1;
+            data.speed = e.param2;
+        }}/>
     );
 };
 
 export const TurnRight = ({ container, data = { degrees: 90, speed: 100 } }) => {
+    data.blockType= "Drive.TurnRight";
+    data.idx = getUniqueID();
+
     return (
         <MoveBlockTemplate direction={"Turn Right"} container={container} data={{
             param1: data.degrees,
-            param2: data.speed
-        }} inputLabel={["Degrees", "% Speed"]} icon="redo" />
+            param2: data.speed,
+            idx: data.idx
+        }} inputLabel={["Degrees", "% Speed"]} icon="redo" 
+        onChange={(e) => {
+            data.degrees = e.param1;
+            data.speed = e.param2;
+        }}/>
     );
 };
 
 export const SunnyPark = ({ container, data = {speed: 100} }) => {
+    data.blockType= "Drive.SunnyPark";
+    data.idx = getUniqueID();
+
     return (
         <Drag
+            data={data}
             container={container}
             url={sunnyBlockBackgroundURL}
         >
@@ -203,6 +295,7 @@ export const SunnyPark = ({ container, data = {speed: 100} }) => {
                 style={{ paddingTop: 20 }}
             >
                 <MDBRow>
+                    <MDBIcon icon="parking" className="me-2"/>
                     <p style={{color: "#000"}}>Sunny Park</p>
                 </MDBRow>
             </MDBCol>
@@ -212,6 +305,9 @@ export const SunnyPark = ({ container, data = {speed: 100} }) => {
                         type="number"
                         min={1}
                         max={50}
+                        onChange={(e) => {
+                            data.speed = e.target.value;
+                        }}
                         defaultValue={data.speed}
                         style={{
                             border: "none",
@@ -229,9 +325,58 @@ export const SunnyPark = ({ container, data = {speed: 100} }) => {
     );
 };
 
-export const ViperGoTo = ({ container, data = {pos: "High" }}) => {
+export const Delay = ({ container, data = {seconds: 1} }) => {
+    data.blockType= "Delay";
+    data.idx = getUniqueID();
+
     return (
         <Drag
+            data={data}
+            container={container}
+            url={blockBackgroundURL}
+        >
+        <MDBRow style={{ paddingTop: 6 }}>
+            <MDBCol
+                className="ms-3 mt-1"
+                size="md"
+                style={{ paddingTop: 20 }}
+            >
+                <MDBRow>
+                    <MDBIcon icon="clock" className="me-2"/>
+                    <p>Delay</p>
+                </MDBRow>
+            </MDBCol>
+                <MDBCol className="" size="md">
+                    <p>Seconds</p>
+                    <input
+                        type="number"
+                        min={1}
+                        defaultValue={data.seconds}
+                        onChange={(e) => {
+                            data.seconds = e.target.value;
+                        }}
+                        style={{
+                            border: "none",
+                            backgroundColor: "rgba(255, 255, 255, 0.5)",
+                            width: 40,
+                            height: 40,
+                            marginTop: -10,
+                            borderRadius: 5,
+                        }}
+                    />
+                </MDBCol>
+        </MDBRow>
+    </Drag>
+    );
+};
+
+export const ViperGoTo = ({ container, data = {pos: "High" }}) => {
+    data.blockType= "Viper.GoTo";
+    data.idx = getUniqueID();
+
+    return (
+        <Drag
+            data={data}
             container={container}
             url={viperBlockBackgroundURL}
         >
@@ -250,6 +395,9 @@ export const ViperGoTo = ({ container, data = {pos: "High" }}) => {
                     <p style={{color: "#000"}}>Go To</p>
                     <input
                         defaultValue={data.pos}
+                        onChange={(e) => {
+                            data.pos = e.target.value;
+                        }}
                         style={{
                             border: "none",
                             backgroundColor: "rgba(255, 255, 255, 0.5)",
@@ -266,9 +414,10 @@ export const ViperGoTo = ({ container, data = {pos: "High" }}) => {
     );
 };
 
-const ClawTemplate = ({label, container}) => {
+const ClawTemplate = ({label, container, data}) => {
     return (
         <Drag
+            data={data}
             container={container}
             url={clawBlockBackgroundURL}
         >
@@ -288,26 +437,39 @@ const ClawTemplate = ({label, container}) => {
     );
 };
 
-export const ClawClose = ({container}) => {
+export const ClawClose = ({container, data = {}}) => {
+    data.blockType= "Claw.Close";
+    data.idx = getUniqueID();
+
     return (
-        <ClawTemplate label={"Close"} container={container} />
+        <ClawTemplate label={"Close"} container={container} data={data} />
     );
 };
 
-export const ClawOpen = ({container}) => {
+export const ClawOpen = ({container, data = {}}) => {
+    data.blockType= "Claw.Open";
+    data.idx = getUniqueID();
+
     return (
-        <ClawTemplate label={"Open"} container={container} />
+        <ClawTemplate label={"Open"} container={container} data={data} />
     );
 };
 
 export const Comment = ({ container, data = { comment: "" } }) => {
+    data.blockType= "Comment";
+    data.idx = getUniqueID();
+
     return (
         <Drag
+            data={data}
             container={container}
             url={commentBlockBackgroundURL}
         >
             <textarea
                 contentEditable={true}
+                onChange={(e) => {
+                    data.comment = e.target.value;
+                }}
                 style={{
                     fontSize: 9,
                     resize: "horizontal",
