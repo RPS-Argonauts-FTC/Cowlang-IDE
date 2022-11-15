@@ -26,6 +26,12 @@ const blockBackgroundURL =
     "url('https://media.discordapp.net/attachments/1018552807508410409/1041781682317033532/Rectangle_9-3.png')";
 const commentBlockBackgroundURL =
     "url('https://media.discordapp.net/attachments/1018552807508410409/1041826366745759754/Puzzle_Comment.png')";
+const sunnyBlockBackgroundURL =
+    "url('https://media.discordapp.net/attachments/829319361843036200/1041920773687889920/DontQuestion.png')";
+const clawBlockBackgroundURL =
+    "url('https://media.discordapp.net/attachments/1018552807508410409/1041923863182852127/Rectangle_12.png')";
+const viperBlockBackgroundURL =
+    "url('https://media.discordapp.net/attachments/1018552807508410409/1041926786105217124/Rectangle_13.png')";
 
 const Drag = ({container, url = blockBackgroundURL, ...props}) => {
 
@@ -67,7 +73,13 @@ const Drag = ({container, url = blockBackgroundURL, ...props}) => {
     );
 }
 
-export const MoveForwards = ({ container, data = { tiles: 1, speed: 100 } }) => {
+const MoveBlockTemplate = ({ direction, inputLabel = ["Tiles", "% Speed"], icon = null, container, data = { param1: 1, param2: 1 } }) => {
+
+    if (icon == null)
+    {
+        icon = "long-arrow-alt-" + (direction === "Forward" ? "up" : (direction === "Backward" ? "down" : String(direction).toLowerCase()));
+    }
+
     return (
         <Drag
             container={container}
@@ -79,17 +91,17 @@ export const MoveForwards = ({ container, data = { tiles: 1, speed: 100 } }) => 
                     style={{ paddingTop: 20 }}
                 >
                     <MDBRow>
-                        <MDBIcon icon="long-arrow-alt-up" />
-                        <p>Forward</p>
+                        <MDBIcon icon={icon} />
+                        <p>{direction}</p>
                     </MDBRow>
                 </MDBCol>
                 <MDBCol className="" size="md">
-                    <p>Tiles</p>
+                    <p>{inputLabel[0]}</p>
                     <input
                         type="number"
                         min={1}
                         max={50}
-                        defaultValue={data.tiles}
+                        defaultValue={data.param1}
                         style={{
                             border: "none",
                             backgroundColor: "rgba(255, 255, 255, 0.5)",
@@ -102,12 +114,12 @@ export const MoveForwards = ({ container, data = { tiles: 1, speed: 100 } }) => 
                     />
                 </MDBCol>
                 <MDBCol className="" size="md">
-                    <p>% Speed</p>
+                    <p>{inputLabel[1]}</p>
                     <input
                         type="number"
                         min={0}
                         max={100}
-                        defaultValue={data.speed}
+                        defaultValue={data.param2}
                         style={{
                             border: "none",
                             width: 40,
@@ -121,6 +133,170 @@ export const MoveForwards = ({ container, data = { tiles: 1, speed: 100 } }) => 
                 </MDBCol>
             </MDBRow>
         </Drag>
+    );
+};
+
+export const MoveForwards = ({ container, data = { tiles: 1, speed: 100 } }) => {
+    return (
+        <MoveBlockTemplate direction={"Forward"} container={container} data={{
+            param1: data.tiles,
+            param2: data.speed
+        }} />
+    );
+};
+
+export const MoveBackwards = ({ container, data = { tiles: 1, speed: 100 } }) => {
+    return (
+        <MoveBlockTemplate direction={"Backward"} container={container} data={{
+            param1: data.tiles,
+            param2: data.speed
+        }} />
+    );
+};
+
+export const MoveLeft = ({ container, data = { tiles: 1, speed: 100 } }) => {
+    return (
+        <MoveBlockTemplate direction={"Left"} container={container} data={{
+            param1: data.tiles,
+            param2: data.speed
+        }} />
+    );
+};
+
+export const MoveRight = ({ container, data = { tiles: 1, speed: 100 } }) => {
+    return (
+        <MoveBlockTemplate direction={"Right"} container={container} data={{
+            param1: data.tiles,
+            param2: data.speed
+        }} />
+    );
+};
+
+export const TurnLeft = ({ container, data = { degrees: 90, speed: 100 } }) => {
+    return (
+        <MoveBlockTemplate direction={"Turn Left"} container={container} data={{
+            param1: data.degrees,
+            param2: data.speed
+        }} inputLabel={["Degrees", "% Speed"]} icon="undo" />
+    );
+};
+
+export const TurnRight = ({ container, data = { degrees: 90, speed: 100 } }) => {
+    return (
+        <MoveBlockTemplate direction={"Turn Right"} container={container} data={{
+            param1: data.degrees,
+            param2: data.speed
+        }} inputLabel={["Degrees", "% Speed"]} icon="redo" />
+    );
+};
+
+export const SunnyPark = ({ container, data }) => {
+    return (
+        <Drag
+            container={container}
+            url={sunnyBlockBackgroundURL}
+        >
+        <MDBRow style={{ paddingTop: 6 }}>
+            <MDBCol
+                className="ms-3 mt-1"
+                size="md"
+                style={{ paddingTop: 20 }}
+            >
+                <MDBRow>
+                    <p style={{color: "#000"}}>🍆 Sunny Park</p>
+                </MDBRow>
+            </MDBCol>
+                <MDBCol className="" size="md">
+                    <p style={{color: "#fff"}}>% Speed</p>
+                    <input
+                        type="number"
+                        min={1}
+                        max={50}
+                        defaultValue={data.speed}
+                        style={{
+                            border: "none",
+                            backgroundColor: "rgba(255, 255, 255, 0.5)",
+                            width: 40,
+                            height: 40,
+                            marginTop: -10,
+                            borderRadius: 5,
+                            color: "#fff",
+                        }}
+                    />
+                </MDBCol>
+        </MDBRow>
+    </Drag>
+    );
+};
+
+export const ViperGoTo = ({ container, data }) => {
+    return (
+        <Drag
+            container={container}
+            url={viperBlockBackgroundURL}
+        >
+        <MDBRow style={{ paddingTop: 6 }}>
+            <MDBCol
+                className="ms-3 mt-1"
+                size="md"
+                style={{ paddingTop: 20 }}
+            >
+                <MDBRow>
+                    <MDBIcon icon={"angle-double-up"} />
+                    <p style={{color: "#000"}}>Viper</p>
+                </MDBRow>
+            </MDBCol>
+                <MDBCol className="" size="md">
+                    <p style={{color: "#000"}}>Go To</p>
+                    <input
+                        defaultValue={data.pos}
+                        style={{
+                            border: "none",
+                            backgroundColor: "rgba(255, 255, 255, 0.5)",
+                            width: 100,
+                            height: 40,
+                            marginTop: -10,
+                            borderRadius: 5,
+                            color: "#404040",
+                        }}
+                    />
+                </MDBCol>
+        </MDBRow>
+    </Drag>
+    );
+};
+
+const ClawTemplate = ({label, container}) => {
+    return (
+        <Drag
+            container={container}
+            url={clawBlockBackgroundURL}
+        >
+        <MDBRow style={{ paddingTop: 6 }}>
+            <MDBCol
+                className="ms-3 mt-1"
+                size="md"
+                style={{ paddingTop: 20 }}
+            >
+                <MDBRow>
+                    <MDBIcon icon={"door-" + String(label).replace("Close", "Closed").toLowerCase()} />
+                    <p style={{color: "#000"}}>Claw {label}</p>
+                </MDBRow>
+            </MDBCol>
+        </MDBRow>
+    </Drag>
+    );
+};
+
+export const ClawClose = ({container}) => {
+    return (
+        <ClawTemplate label={"Close"} container={container} />
+    );
+};
+
+export const ClawOpen = ({container}) => {
+    return (
+        <ClawTemplate label={"Open"} container={container} />
     );
 };
 

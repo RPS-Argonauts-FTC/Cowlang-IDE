@@ -24,7 +24,7 @@ import { MDBWysiwyg } from "mdb-react-wysiwyg";
 import { MDBFileUpload } from "mdb-react-file-upload";
 import { MDBDraggable } from "mdb-react-drag-and-drop";
 
-import { Comment, MoveForwards } from "./blocks/Blocks";
+import { ClawClose, ClawOpen, Comment, MoveBackwards, MoveForwards, MoveLeft, MoveRight, SunnyPark, TurnLeft, TurnRight, ViperGoTo } from "./blocks/Blocks";
 
 function App() {
     const [openFileUploadDialog, setOpenFileUploadDialog] =
@@ -42,15 +42,122 @@ function App() {
 
     const blockCodeContainer = React.useRef(null);
 
+    const reformatBlocks = () => {
+        var lines = document.getElementById("editor").innerText.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "<br/>").replace(" ", "").split("<br/>");
+
+        var tobe = [];
+
+        // tobe.push(<Comment container={blockCodeContainer} data={{comment: "[FILETYPE=COWLANG]"}} />);
+
+        // console.log(commentables);
+
+        // for (var i = 1; i < commentables.length; i += 2)
+        // {
+        //     if (commentables[i] !== "")
+        //     {
+        //         tobe.push(<Comment container={blockCodeContainer} data={{comment: commentables[i]}} />);
+        //     }
+        // }
+
+        var comment = "";
+
+        var inComment = false;
+        for (var i = 0; i < lines.length; i++)
+        {
+            var line = lines[i];
+
+            console.log(line)
+
+            if (line.includes("/*") || line.includes("*/")){
+                if (inComment){
+                    console.log("exit at " + i);
+                    inComment = false;
+                    tobe.push(<Comment container={blockCodeContainer} data={{comment: comment}} />);
+                    comment = "";
+                }
+                else {
+                    console.log("enter at " + i);
+                    inComment = true;
+                }
+                continue;
+            }
+
+            if (inComment)
+            {
+                comment += line;
+                continue;
+            }
+
+            const params = line.slice(line.indexOf("(") + 1, line.lastIndexOf(")")).split(",");
+            if (line.includes("Drive.Forward"))
+            {
+                tobe.push(<MoveForwards container={blockCodeContainer} data={{tiles: Number(params[0]), speed: Number(params[1])}}/>)
+            }
+            else if (line.includes("Drive.Backward"))
+            {
+                tobe.push(<MoveBackwards container={blockCodeContainer} data={{tiles: Number(params[0]), speed: Number(params[1])}}/>)
+            }
+            else if (line.includes("Drive.Left"))
+            {
+                tobe.push(<MoveLeft container={blockCodeContainer} data={{tiles: Number(params[0]), speed: Number(params[1])}}/>)
+            }
+            else if (line.includes("Drive.Right"))
+            {
+                tobe.push(<MoveRight container={blockCodeContainer} data={{tiles: Number(params[0]), speed: Number(params[1])}}/>)
+            }
+            else if (line.includes("Drive.TurnLeft"))
+            {
+                tobe.push(<TurnLeft container={blockCodeContainer} data={{degrees: Number(params[0]), speed: Number(params[1])}}/>)
+            }
+            else if (line.includes("Drive.TurnRight"))
+            {
+                tobe.push(<TurnRight container={blockCodeContainer} data={{degrees: Number(params[0]), speed: Number(params[1])}}/>)
+            }
+            else if (line.includes("Drive.SunnyPark"))
+            {
+                tobe.push(<SunnyPark container={blockCodeContainer} data={{speed: params[0]}}/>)
+            }
+            else if (line.includes("Claw.Open"))
+            {
+                tobe.push(<ClawOpen container={blockCodeContainer}/>)
+            }
+            else if (line.includes("Claw.Close"))
+            {
+                tobe.push(<ClawClose container={blockCodeContainer}/>)
+            }
+            else if (line.includes("Viper.GoTo"))
+            {
+                tobe.push(<ViperGoTo container={blockCodeContainer} data={{pos: params[0]}}/>)
+            }
+            else {
+                if (line.replaceAll(" ", "").replaceAll(" ", "") == "")
+                {
+                    continue;
+                }
+                tobe.push(<Comment container={blockCodeContainer} data={{comment: line}} />);
+            }
+        }
+
+        console.log(tobe);
+
+        setBlocks(tobe);
+    };
+
     const reformatTextbox = () => {
         var content = document.getElementById("editor").innerText;
 
         content = content.replaceAll("\n", "<br />");
-        content = content.replaceAll(/.*\[FILETYPE\=COWLANG]/g, "<b style='color: #ff6347;'>[FILETYPE=COWLANG]</b>");
+
+        content = content.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "")
+
+        // content = content.replaceAll(/.*\[FILETYPE\=COWLANG]/g, "<b style='color: #ff6347;'>[FILETYPE=COWLANG]</b>");
 
         content = content.replaceAll("Forwards", "Forward").replaceAll("Backwards", "Backward");
 
-        var comments = content.match(/'''.*?'''/g);
+        content = content.replace(/(<br \/>)*\/\*(<br \/>)*/g, "<br />/*<br />");
+        content = content.replace(/(<br \/>)*\*\/(<br \/>)*/g, "<br />*/<br />");
+
+        var comments = content.match(/\/\*.*?\*\//g);
         
         if (comments) {
             for (var comment of comments)
@@ -108,7 +215,7 @@ function App() {
 
         content = content.replaceAll("(", "<b style='color: #a834eb;'>(</b>").replaceAll(")", "<b style='color: #a834eb;'>)</b>");
 
-        content = content.split("<br />").map((line, index) => { return "<span style='color: #404040;' class='me-0'>|||</span><span style='color: #666666; font-style: normal; ' class='me-3'>" + index + " </span><span style='color: #404040;' class='me-4'>|||</span>" + line.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "")}).join("<br />");
+        content = content.split("<br />").map((line, index) => { return "<span style='color: #404040;' class='me-0'>|||</span><span style='color: #666666; font-style: normal; ' class='me-3'>" + index + " </span><span style='color: #404040;' class='me-4'>|||</span>" + line}).join("<br />");
 
         document.getElementsByClassName(
             "wysiwyg-content"
@@ -121,72 +228,10 @@ function App() {
 
     useEffect(() => {
         if (mode === "Block Code")
-        {    
-            var lines = document.getElementById("editor").innerText.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "<br/>").replace(" ", "").replace("[FILETYPE=COWLANG]", "").split("<br/>");
-
-            var tobe = [];
-
-            // tobe.push(<Comment container={blockCodeContainer} data={{comment: "[FILETYPE=COWLANG]"}} />);
-
-            // console.log(commentables);
-
-            // for (var i = 1; i < commentables.length; i += 2)
-            // {
-            //     if (commentables[i] !== "")
-            //     {
-            //         tobe.push(<Comment container={blockCodeContainer} data={{comment: commentables[i]}} />);
-            //     }
-            // }
-
-            var comment = "";
-
-            var inComment = false;
-            for (var i = 0; i < lines.length; i++)
-            {
-                var line = lines[i];
-
-                console.log(line)
-
-                if (line.includes("'''")){
-                    if (inComment){
-                        console.log("exit at " + i);
-                        inComment = false;
-                        tobe.push(<Comment container={blockCodeContainer} data={{comment: comment}} />);
-                        comment = "";
-                    }
-                    else {
-                        console.log("enter at " + i);
-                        inComment = true;
-                    }
-                    continue;
-                }
-
-                if (inComment)
-                {
-                    comment += line;
-                    continue;
-                }
-
-                if (line.includes("Drive.Forward"))
-                {
-                    const params = line.slice(line.indexOf("(") + 1, line.lastIndexOf(")")).split(",");
-                    console.log(params);
-                    tobe.push(<MoveForwards container={blockCodeContainer} data={{tiles: Number(params[0]), speed: Number(params[1])}}/>)
-                }
-                else {
-                    if (line.replaceAll(" ", "").replaceAll(" ", "") == "")
-                    {
-                        continue;
-                    }
-                    tobe.push(<Comment container={blockCodeContainer} data={{comment: line}} />);
-                }
-            }
-
-            console.log(tobe);
-
-            setBlocks(tobe);
+        {
+            reformatBlocks();
         }
-    }, [mode])
+    }, [mode]);
 
     return (
         <div
@@ -313,7 +358,7 @@ function App() {
                                     "data:text/plain;charset=utf-8, " +
                                         encodeURIComponent(
                                             document.getElementById("editor")
-                                                .innerText.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "")
+                                                .innerText.replace(/\|\|\|[0-9]*\s*\|\|\|?/g, "\n")
                                         )
                                 );
                                 element.setAttribute("download", newFileName);
@@ -325,6 +370,45 @@ function App() {
                         >
                             <MDBIcon icon="download" className="me-2" />
                             Download "{fileName}.cow"
+                        </MDBBtn>
+                        <MDBBtn
+                            outline
+                            className="me-2"
+                            color="light"
+                            style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 600,
+                                height: 47,
+                                border: "none",
+                                backgroundColor: "#404040",
+                                borderRadius: "0px",
+                            }}
+                            onClick={() => {
+                                document.getElementsByClassName(
+                                    "wysiwyg-content"
+                                )[0].innerText = `
+Drive.Forward(1, 100);
+Drive.Backward(1, 100);
+
+Drive.Right(1, 100);
+Drive.Left(1, 100);
+
+Drive.TurnRight(90, 100);
+Drive.TurnLeft(90, 100);
+
+Drive.SunnyPark(100);
+
+Claw.Open();
+Claw.Close();
+
+Viper.GoTo(High);
+                                `;
+                                reformatTextbox();
+                            }}
+                        >
+                            <MDBIcon icon="upload" className="me-2" />
+                            Load Sample
                         </MDBBtn>
                     </MDBContainer>
 
@@ -392,12 +476,12 @@ function App() {
                                             width: "98vw",
                                             backgroundColor: "#404040",
                                             textAlign: "left",
+                                            paddingBottom: 50,
                                         }}
                                         className="rounded-5"
                                     >
                                         <i style={{ color: "#bcf2a2" }}>
-[FILETYPE=COWLANG] <br/>
-''' <br/>
+/* <br/>
 Welcome, this is a Cowlang file  <br/>
 -=-=-=-=-=-| Syntax |-=-=-=-=-=-  <br/>
 The Cowlang programming language is a simple, instruction-based language with the following commands. <br/>
@@ -420,7 +504,7 @@ Viper.GoTo(position); - set viper to position, can be a string from [Ground, Low
 -=-=-=-=-=-| Advanced |-=-=-=-=-=-  <br/>
 Adding a ! before a function, eg !Drive.Right(tiles, speed); will make it flagged, and will not be transpiled with right-to-left. <br/>
 Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in a separate thread. (will run next command with current) <br/>
-'''
+*/
                                         </i>
                                     </MDBWysiwyg>
                                 </div>
