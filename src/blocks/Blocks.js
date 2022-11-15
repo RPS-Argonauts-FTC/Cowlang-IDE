@@ -190,7 +190,7 @@ export const TurnRight = ({ container, data = { degrees: 90, speed: 100 } }) => 
     );
 };
 
-export const SunnyPark = ({ container, data }) => {
+export const SunnyPark = ({ container, data = {speed: 100} }) => {
     return (
         <Drag
             container={container}
@@ -203,7 +203,7 @@ export const SunnyPark = ({ container, data }) => {
                 style={{ paddingTop: 20 }}
             >
                 <MDBRow>
-                    <p style={{color: "#000"}}>🍆 Sunny Park</p>
+                    <p style={{color: "#000"}}>Sunny Park</p>
                 </MDBRow>
             </MDBCol>
                 <MDBCol className="" size="md">
@@ -229,7 +229,7 @@ export const SunnyPark = ({ container, data }) => {
     );
 };
 
-export const ViperGoTo = ({ container, data }) => {
+export const ViperGoTo = ({ container, data = {pos: "High" }}) => {
     return (
         <Drag
             container={container}

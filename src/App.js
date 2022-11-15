@@ -4,6 +4,10 @@ import {
     MDBBtnGroup,
     MDBCol,
     MDBContainer,
+    MDBDropdown,
+    MDBDropdownItem,
+    MDBDropdownMenu,
+    MDBDropdownToggle,
     MDBFile,
     MDBIcon,
     MDBInput,
@@ -38,7 +42,7 @@ function App() {
 
     const [mode, setMode] = React.useState("Line Code");
 
-    const [lastKeyDownInUnix, setLastKeyDownInUnix] = React.useState((new Date).getTime());
+    const [blockToSynthesis, setBlockToSynthesis] = React.useState("");
 
     const blockCodeContainer = React.useRef(null);
 
@@ -130,7 +134,7 @@ function App() {
                 tobe.push(<ViperGoTo container={blockCodeContainer} data={{pos: params[0]}}/>)
             }
             else {
-                if (line.replaceAll(" ", "").replaceAll(" ", "").replaceAll("\n") == "")
+                if (line.replaceAll(" ", "").replaceAll(" ", "").replaceAll("\n", "") == "")
                 {
                     continue;
                 }
@@ -519,6 +523,109 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                 {mode === "Block Code" && <section ref={blockCodeContainer} style={{height: "10000px", width: "98vw", backgroundColor: "#404040", borderRadius: "5px"}}>
                                     {blocks}
                               </section>}
+                              <MDBDropdown dropup group>
+                                <MDBDropdownToggle style={{position: "fixed", right: 25, bottom: 25, borderRadius: 100, width: 0, height: 0, backgroundColor: "#404040"}}></MDBDropdownToggle>
+                                <MDBDropdownMenu alwaysOpen dark style={{borderRadius: 10}}>
+                                    <MDBDropdownItem header>
+                                        Blocks
+                                    </MDBDropdownItem>
+                                    <MDBDropdownItem divider />
+                                    <MDBDropdownItem link onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<MoveForwards container={blockCodeContainer} />);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Forward
+                                    </MDBDropdownItem>
+                                    <MDBDropdownItem link onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<MoveBackwards container={blockCodeContainer} />);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Backward
+                                    </MDBDropdownItem> 
+                                    <MDBDropdownItem link onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<MoveLeft container={blockCodeContainer} />);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Left
+                                    </MDBDropdownItem>
+                                    <MDBDropdownItem link onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<MoveRight container={blockCodeContainer} />);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Right
+                                    </MDBDropdownItem>
+                                    <MDBDropdownItem divider />
+                                    <MDBDropdownItem link onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<TurnLeft container={blockCodeContainer} />);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Turn Left
+                                    </MDBDropdownItem>
+                                    <MDBDropdownItem link  onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<TurnRight container={blockCodeContainer} />);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Turn Right
+                                    </MDBDropdownItem>
+                                    <MDBDropdownItem divider />
+                                    <MDBDropdownItem link  onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<SunnyPark container={blockCodeContainer} />);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Sunny Park
+                                    </MDBDropdownItem>
+                                    <MDBDropdownItem divider />
+                                    <MDBDropdownItem link onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<ClawOpen container={blockCodeContainer} />);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Open Claw
+                                    </MDBDropdownItem>
+                                    <MDBDropdownItem link onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<ClawClose container={blockCodeContainer} />);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Close Claw
+                                    </MDBDropdownItem>
+                                    <MDBDropdownItem divider />
+                                    <MDBDropdownItem link onClick={
+                                        () => {
+                                            const newBlocks = [...blocks];
+                                            newBlocks.push(<ViperGoTo container={blockCodeContainer} />);
+                                            setBlocks(newBlocks);
+                                        }
+                                    }>
+                                        Viper Go To
+                                    </MDBDropdownItem>
+                                </MDBDropdownMenu>
+                              </MDBDropdown>
                             </MDBTabsPane>
                         </MDBTabsContent>
                     </MDBTabs>
