@@ -49,7 +49,7 @@ function App() {
 
     const [mode, setMode] = React.useState("Line Code");
 
-    const [blockToSynthesis, setBlockToSynthesis] = React.useState("");
+    const [showLineCodeDocs, setShowLineCodeDocs] = React.useState(false);
 
     const blockCodeContainer = React.useRef(null);
 
@@ -209,8 +209,8 @@ function App() {
         )[0].innerText = content;
     };
 
-    const reformatTextbox = () => {
-        var content = document.getElementById("editor").innerText;
+    const reformatTextbox = (id = "editor") => {
+        var content = document.getElementById(id).innerText;
 
         content = content.replaceAll("\n", "<br />");
 
@@ -283,9 +283,15 @@ function App() {
 
         content = content.split("<br />").map((line, index) => { return "<span class='me-0'>   </span><span style='color: #666666; font-style: normal; ' class='me-3'>" + index + " </span><span class='me-4'>   </span>" + line}).join("<br />");
 
-        document.getElementsByClassName(
-            "wysiwyg-content"
-        )[0].innerHTML = content;
+        if (id === "editor")
+        {
+            document.getElementsByClassName(
+                "wysiwyg-content"
+            )[0].innerHTML = content;
+        }
+        else {
+            document.getElementById(id).innerHTML = content;
+        }
     }
 
     useEffect(() => {
@@ -353,7 +359,7 @@ function App() {
                                         className="rounded-5"
                                         style={{
                                             height: "400px",
-                                            backgroundColor: "#404040",
+                                            backgroundColor: "#303030",
                                         }}
                                         acceptedExtensions={[".cow"]}
                                         defaultMessage={
@@ -366,26 +372,90 @@ function App() {
                     </MDBModalDialog>
                 </MDBModal>
 
+                <MDBModal show={showLineCodeDocs} setShow={setShowLineCodeDocs} onShow={() => {
+                    reformatTextbox("docs");
+                }}>
+                    <MDBModalDialog>
+                        <MDBModalContent style={{ backgroundColor: "#292929" }}>
+
+                            <MDBModalHeader>
+                                <MDBModalTitle style={{ color: "white" }}>
+                                    Cowlang Editor Documentation
+                                </MDBModalTitle>
+                            </MDBModalHeader>
+
+                            <MDBModalBody>
+                                <div id="docs" contentEditable={false} style={{ height: "400px", overflowY: "scroll" }}>
+                                    /* The Cowlang programming language is a simple, instruction-based language with the following commands. */
+
+Drive.Forward(tiles, speed);- tiles: tiles to go forward, speed: speed of robot [0, 1] <br/>
+Drive.Backward(tiles, speed); - tiles: tiles to go backward, speed: speed of robot [0, 1]<br/>
+Drive.Left(tiles, speed); - tiles: tiles to go left, speed: speed of robot [0, 1]<br/>
+Drive.Right(tiles, speed); - tiles: tiles to go right, speed: speed of robot [0, 1]<br/>
+
+Drive.TurnLeft(degrees, speed); - degrees: degrees to turn left, speed: speed of robot [0, 1]<br/>
+Drive.TurnRight(degrees, speed); - degrees: degrees to turn right, speed: speed of robot [0, 1]<br/>
+
+Drive.SunnyPark(); - parks the robot according to scanned AprilTags at beginning of program<br/>
+
+Claw.Open(); - opens the claw<br/>
+Claw.Close(); - closes the claw<br/>
+
+Viper.GoTo(pos); - position to go to <br/>
+
+Delay(seconds); - seconds to delay<br/>
+                                </div>
+                            </MDBModalBody>
+                        </MDBModalContent>
+                    </MDBModalDialog>
+                </MDBModal>
+
                 <div className="text-center mt-2">
 
                     <h3 className="mb-1 mt-5">Cowlang IDE</h3>
                     <p className="mb-0 pb-0">
                         A light-weight IDE made for FTC programming.
                     </p>
-                    <MDBInput
+                    <input
                         className="mt-4"
-                        label="Project Name"
-                        contrast
+                        style={{borderRadius: 5, backgroundColor: "#303030", color: "#f5f7ff", border: "none", paddingLeft: 5, width: "auto"}}
                         value={fileName}
                         onChange={(e) => {
                             var newFileName = e.target.value;
                             setFileName(newFileName);
                         }}
                     />
-                    {mode === "Line Code" && <details open>
-                        <summary>Documentation</summary>
-                        <i style={{ color: "#bcf2a2" }}>
-Welcome To Cowlang <br/>
+                    <span>.cow</span>
+                    {mode === "Line Code" && <MDBDropdown className='shadow-0' style={{position: "fixed", right: 125, top: 25, bottom: 25, overflowY: "scroll"}}>
+                                <MDBDropdownMenu alwaysOpen style={{borderRadius: 10}}>
+                                    <MDBDropdownItem link onClick={() => {
+                                        setShowLineCodeDocs(true);
+                                    }}>Documentation</MDBDropdownItem>
+                                    <MDBDropdownItem link onClick={() => {
+                                document.getElementsByClassName(
+                                    "wysiwyg-content"
+                                )[0].innerText = `
+/*
+On Autonomous Begin
+*/
+Drive.Forward(1, 100);
+Drive.Backward(1, 100);
+
+Drive.Right(1, 100);
+Drive.Left(1, 100);
+
+Drive.TurnRight(90, 100);
+Drive.TurnLeft(90, 100);
+
+Drive.SunnyPark(100);
+
+Claw.Open();
+Claw.Close();
+
+Viper.GoTo(High);
+
+Delay(1);`;}}>Load Example</MDBDropdownItem>
+                        {/* <i style={{ color: "#bcf2a2" }}>
 -=-=-=-=-=-| Syntax |-=-=-=-=-=-  <br/>
 The Cowlang programming language is a simple, instruction-based language with the following commands. <br/>
 <br/>
@@ -407,8 +477,9 @@ Viper.GoTo(position); - set viper to position, can be a string from [Ground, Low
 -=-=-=-=-=-| Advanced |-=-=-=-=-=-   <br/>
 Adding a ! before a function, eg !Drive.Right(tiles, speed); will make it flagged, and will not be transpiled with right-to-left. <br/>
 Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in a separate thread. (will run next command with current) <br/>
-                        </i>
-                    </details>}
+                        </i> */}
+                        </MDBDropdownMenu>
+                    </MDBDropdown>}
 
                     <MDBContainer className="mt-4">
                         <MDBBtn
@@ -418,18 +489,17 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                             style={{
                                 position: "absolute",
                                 top: 0,
-                                left: 280,
+                                left: 0,
                                 height: 47,
                                 border: "none",
-                                backgroundColor: "#404040",
+                                // backgroundColor: "#303030",
                                 borderRadius: "0px",
                             }}
                             onClick={() => {
                                 setOpenFileUploadDialog(true);
                             }}
                         >
-                            <MDBIcon icon="upload" className="me-2" />
-                            Upload Work
+                            <MDBIcon icon="upload" className="me-0" />
                         </MDBBtn>
                         <MDBBtn
                             outline
@@ -438,10 +508,10 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                             style={{
                                 position: "absolute",
                                 top: 0,
-                                left: 420,
+                                left: 60,
                                 height: 47,
                                 border: "none",
-                                backgroundColor: "#404040",
+                                // backgroundColor: "#303030",
                                 borderRadius: "0px",
                             }}
                             onClick={() => {
@@ -473,50 +543,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                             }}
                         >
                             <MDBIcon icon="download" className="me-2" />
-                            Download "{fileName}.cow"
-                        </MDBBtn>
-                        <MDBBtn
-                            outline
-                            className="me-2"
-                            color="light"
-                            style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 600,
-                                height: 47,
-                                border: "none",
-                                backgroundColor: "#404040",
-                                borderRadius: "0px",
-                            }}
-                            onClick={() => {
-                                document.getElementsByClassName(
-                                    "wysiwyg-content"
-                                )[0].innerText = `
-/*
-On Autonomous Begin
-*/
-Drive.Forward(1, 100);
-Drive.Backward(1, 100);
-
-Drive.Right(1, 100);
-Drive.Left(1, 100);
-
-Drive.TurnRight(90, 100);
-Drive.TurnLeft(90, 100);
-
-Drive.SunnyPark(100);
-
-Claw.Open();
-Claw.Close();
-
-Viper.GoTo(High);
-
-Delay(1);`;
-                                setMode("Line Code");
-                            }}
-                        >
-                            <MDBIcon icon="upload" className="me-2" />
-                            Load Sample
+                            {/* Download "{fileName}.cow" */}
                         </MDBBtn>
                         <MDBBtn
                             outline
@@ -524,14 +551,14 @@ Delay(1);`;
                             color="link"
                             id="clear-btn"
                             style={{
-                                position: "absolute",
-                                top: 50,
-                                left: 0,
+                                position: "fixed",
+                                bottom: 15,
+                                left: 15,
                                 height: 50,
                                 border: "none",
-                                // backgroundColor: "#404040",
+                                backgroundColor: "#fff",
                                 color: "red",
-                                borderRadius: "0px",
+                                borderRadius: "15px",
                             }}
                             onClick={() => {
                                 document.getElementsByClassName(
@@ -542,23 +569,23 @@ Delay(1);`;
                                 reformatBlocks();
                             }}
                         >
-                            <MDBIcon icon="times" className="me-2" />
-                            Clear
+                            <MDBIcon icon="trash" className="me-2" />
+                            Reset
                         </MDBBtn>
                     </MDBContainer>
 
-                    <MDBTabs style={{ position: "absolute", top: 0, left: 0 }}>
+                    <MDBTabs>
+                         {/* style={{ position: "absolute", top: 0, left: 0 }}> */}
                         <MDBTabsItem>
                             <MDBTabsLink
                                 onClick={() => setMode("Line Code")}
                                 style={{
                                     color: "white",
-                                    backgroundColor: "#404040",
+                                    backgroundColor: "#232323",
                                 }}
                                 active={mode === "Line Code"}
                             >
-                                <MDBIcon icon="code" className="me-2" />
-                                Line Code
+                                <MDBIcon icon="code" className="me-0" />
                             </MDBTabsLink>
                         </MDBTabsItem>
                         <MDBTabsItem>
@@ -566,12 +593,11 @@ Delay(1);`;
                                 onClick={() => setMode("Block Code")}
                                 style={{
                                     color: "white",
-                                    backgroundColor: "#404040",
+                                    backgroundColor: "#232323",
                                 }}
                                 active={mode === "Block Code"}
                             >
-                                <MDBIcon icon="th-large" className="me-2" />
-                                Block Code
+                                <MDBIcon icon="th-large" className="me-0" />
                             </MDBTabsLink>
                         </MDBTabsItem>
                     </MDBTabs>
@@ -609,9 +635,11 @@ Delay(1);`;
                                         style={{
                                             height: "auto",
                                             width: "98vw",
-                                            backgroundColor: "#404040",
+                                            marginTop: -20,
+                                            backgroundColor: "#303030",
                                             textAlign: "left",
                                             paddingBottom: 50,
+                                            border: "none",
                                         }}
                                         className="rounded-5"
                                     >
@@ -621,7 +649,7 @@ Delay(1);`;
                             <MDBTabsPane
                                 show={mode === "Block Code"}
                             >
-                                {mode === "Block Code" && <section ref={blockCodeContainer} style={{height: "10000px", width: "98vw", backgroundColor: "#404040", borderRadius: "5px"}}>
+                                {mode === "Block Code" && <section ref={blockCodeContainer} style={{height: "10000px", width: "98vw", backgroundColor: "#303030", borderRadius: "5px", marginTop: 5}}>
                                     {blocks}
                               </section>}
                               {mode === "Block Code" && <MDBDropdown className='shadow-0' style={{position: "fixed", right: 125, top: 25}}>
