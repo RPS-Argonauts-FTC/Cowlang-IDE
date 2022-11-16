@@ -382,7 +382,7 @@ function App() {
                             setFileName(newFileName);
                         }}
                     />
-                    {mode === "Line Code" && <details>
+                    {mode === "Line Code" && <details open>
                         <summary>Documentation</summary>
                         <i style={{ color: "#bcf2a2" }}>
 Welcome To Cowlang <br/>
@@ -449,6 +449,12 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                 if (!newFileName.endsWith(".cow")) {
                                     newFileName += ".cow";
                                 }
+
+                                if (mode === "Block Code")
+                                {
+                                    recalculateTextbox();
+                                }
+                                reformatTextbox();
 
                                 var element = document.createElement("a");
                                 element.setAttribute(
