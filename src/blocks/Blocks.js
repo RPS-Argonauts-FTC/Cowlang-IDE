@@ -23,15 +23,15 @@ import {
 import { MDBDraggable } from "mdb-react-drag-and-drop";
 
 const blockBackgroundURL =
-    "url('https://media.discordapp.net/attachments/1018552807508410409/1041781682317033532/Rectangle_9-3.png')";
+    "https://media.discordapp.net/attachments/1018552807508410409/1041781682317033532/Rectangle_9-3.png";
 const commentBlockBackgroundURL =
-    "url('https://media.discordapp.net/attachments/1018552807508410409/1041826366745759754/Puzzle_Comment.png')";
+    "https://media.discordapp.net/attachments/1018552807508410409/1041826366745759754/Puzzle_Comment.png";
 const sunnyBlockBackgroundURL =
-    "url('https://media.discordapp.net/attachments/829319361843036200/1041920773687889920/DontQuestion.png')";
+    "https://media.discordapp.net/attachments/829319361843036200/1042238027927400531/DontQuestion.png";
 const clawBlockBackgroundURL =
-    "url('https://media.discordapp.net/attachments/1018552807508410409/1041923863182852127/Rectangle_12.png')";
+    "https://media.discordapp.net/attachments/1018552807508410409/1041923863182852127/Rectangle_12.png";
 const viperBlockBackgroundURL =
-    "url('https://media.discordapp.net/attachments/1018552807508410409/1041926786105217124/Rectangle_13.png')";
+    "https://media.discordapp.net/attachments/1018552807508410409/1041926786105217124/Rectangle_13.png";
 
 var uuid = require("uuid");
 
@@ -52,6 +52,7 @@ const getUniqueID = () => {
 const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
 
     const [close, setClosed] = React.useState(false);
+    const [hovered, setHovered] = React.useState(false);
 
     if (close)
     {
@@ -73,19 +74,13 @@ const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
     }
 
     return (
-        <div
-            onMouseUp={() => {
-
-            }}
-            onMouseDown={() => {
-                // console.log("down")
-            }}
-        >
+        // <div
+            
+        // >
             <MDBDraggable
                 container={container}
                 style={{
                     fontSize: 12,
-                    backgroundImage: url,
                     color: "#404040",
                     width: 300,
                     height: 94,
@@ -93,13 +88,23 @@ const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
                     // backgroundColor: "rgba(255, 255, 255, 0.25)",
                     overflow: "show"
                 }}
+
+                onMouseEnter={() => {
+                    setHovered(true);
+                }}
+                onMouseLeave={() => {
+                    setHovered(false);
+                }}
             >
-                 <a style={{color: "#404040", position: "absolute", left: 5, top: 40, width: 5, height: 5}} onClick={() => {
-                    setClosed(true);
-                 }}><MDBIcon icon="trash" size="sm"/></a>
-                {props.children}
+                <img src={url} style={{width: "100%", height: 110, marginTop: 0, left: 0}} />
+                <div style={{marginTop: -100}}>
+                    { hovered && <a style={{color: "red", position: "absolute", left: 5, top: 40, width: 5, height: 5}} onClick={() => {
+                        setClosed(true);
+                    }}><MDBIcon icon="trash" size="sm"/></a>}
+                    {props.children}
+                </div>
             </MDBDraggable>
-        </div>
+        // </div>
     );
 }
 
@@ -294,13 +299,13 @@ export const SunnyPark = ({ container, data = {speed: 100} }) => {
                 size="md"
                 style={{ paddingTop: 20 }}
             >
-                <MDBRow>
+                <MDBRow style={{color: "#ff00d3"}}>
                     <MDBIcon icon="parking" className="me-2"/>
-                    <p style={{color: "#000"}}>Sunny Park</p>
+                    <p>박순호</p>
                 </MDBRow>
             </MDBCol>
                 <MDBCol className="" size="md">
-                    <p style={{color: "#fff"}}>% Speed</p>
+                    <p style={{color: "#ff00d3"}}>% Speed</p>
                     <input
                         type="number"
                         min={1}
@@ -316,7 +321,7 @@ export const SunnyPark = ({ container, data = {speed: 100} }) => {
                             height: 40,
                             marginTop: -10,
                             borderRadius: 5,
-                            color: "#fff",
+                            color: "#ff00d3",
                         }}
                     />
                 </MDBCol>

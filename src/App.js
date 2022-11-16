@@ -382,6 +382,33 @@ function App() {
                             setFileName(newFileName);
                         }}
                     />
+                    {mode === "Line Code" && <details>
+                        <summary>Documentation</summary>
+                        <i style={{ color: "#bcf2a2" }}>
+Welcome To Cowlang <br/>
+-=-=-=-=-=-| Syntax |-=-=-=-=-=-  <br/>
+The Cowlang programming language is a simple, instruction-based language with the following commands. <br/>
+<br/>
+Drive.Forward(tiles, speed); - drive forwards by tiles [1, 50] @ speed [0, 100] %  <br/>
+Drive.Backward(tiles, speed); - drive backwards by tiles [1, 50]  @ speed [0, 100] %  <br/>
+Drive.Left(tiles, speed); - drive left by tiles [1, 50]  @ speed [0, 100] %  <br/>
+Drive.Right(tiles, speed); - drive right by tiles [1, 50]  @ speed [0, 100] %  <br/>
+<br/>
+Drive.TurnLeft(degrees, speed); - turns left by degrees  @ speed [0, 100] %  <br/>
+Drive.TurnRight(degrees, speed); - turns right by degrees  @ speed [0, 100] %  <br/>
+<br/>
+Drive.SunnyPark(speed); - parks to designated zone scanned OnInit from where robot is on field rn   @ speed [0, 100] %  <br/>
+<br/>
+Claw.Open(); - set claw to open; if already open, ignored <br/>
+Claw.Close(); - set claw to open; if already open, ignored  <br/>
+<br/>
+Viper.GoTo(position); - set viper to position, can be a string from [Ground, Low, Medium, High] or an integer value <br/>
+<br/>
+-=-=-=-=-=-| Advanced |-=-=-=-=-=-   <br/>
+Adding a ! before a function, eg !Drive.Right(tiles, speed); will make it flagged, and will not be transpiled with right-to-left. <br/>
+Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in a separate thread. (will run next command with current) <br/>
+                        </i>
+                    </details>}
 
                     <MDBContainer className="mt-4">
                         <MDBBtn
@@ -460,7 +487,7 @@ function App() {
                                     "wysiwyg-content"
                                 )[0].innerText = `
 /*
-Keep this comment here, good for formatting.
+On Autonomous Begin
 */
 Drive.Forward(1, 100);
 Drive.Backward(1, 100);
@@ -489,6 +516,7 @@ Delay(1);`;
                             outline
                             className="me-2"
                             color="link"
+                            id="clear-btn"
                             style={{
                                 position: "absolute",
                                 top: 50,
@@ -502,8 +530,10 @@ Delay(1);`;
                             onClick={() => {
                                 document.getElementsByClassName(
                                     "wysiwyg-content"
-                                )[0].innerText = `/*\nKeep this comment here, good for formatting.\n*/`;
-                                setMode("Line Code");
+                                )[0].innerText = `/*\nOn Autonomous Begin\n\n*/`;
+                                setBlocks([]);
+                                reformatTextbox();
+                                reformatBlocks();
                             }}
                         >
                             <MDBIcon icon="times" className="me-2" />
@@ -579,32 +609,6 @@ Delay(1);`;
                                         }}
                                         className="rounded-5"
                                     >
-                                        <i style={{ color: "#bcf2a2" }}>
-/* <br/>
-Welcome, this is a Cowlang file  <br/>
--=-=-=-=-=-| Syntax |-=-=-=-=-=-  <br/>
-The Cowlang programming language is a simple, instruction-based language with the following commands. <br/>
-<br/>
-Drive.Forward(tiles, speed); - drive forwards by tiles [1, 50] @ speed [0, 100] % <br/>
-Drive.Backward(tiles, speed); - drive backwards by tiles [1, 50]  @ speed [0, 100] % <br/>
-Drive.Left(tiles, speed); - drive left by tiles [1, 50]  @ speed [0, 100] % <br/>
-Drive.Right(tiles, speed); - drive right by tiles [1, 50]  @ speed [0, 100] % <br/>
-<br/>
-Drive.TurnLeft(degrees, speed); - turns left by degrees  @ speed [0, 100] % <br/>
-Drive.TurnRight(degrees, speed); - turns right by degrees  @ speed [0, 100] % <br/>
-<br/>
-Drive.SunnyPark(speed); - parks to designated zone scanned OnInit from where robot is on field rn   @ speed [0, 100] % <br/>
-<br/>
-Claw.Open(); - set claw to open; if already open, ignored <br/>
-Claw.Close(); - set claw to open; if already open, ignored <br/>
-<br/>
-Viper.GoTo(position); - set viper to position, can be a string from [Ground, Low, Medium, High] or an integer value <br/>
-<br/>
--=-=-=-=-=-| Advanced |-=-=-=-=-=-  <br/>
-Adding a ! before a function, eg !Drive.Right(tiles, speed); will make it flagged, and will not be transpiled with right-to-left. <br/>
-Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in a separate thread. (will run next command with current) <br/>
-*/
-                                        </i>
                                     </MDBWysiwyg>
                                 </div>
                             </MDBTabsPane>
