@@ -88,6 +88,8 @@ const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
                     overflow: "show"
                 }}
 
+                id={data.idx}
+
                 onMouseEnter={() => {
                     setHovered(true);
                 }}

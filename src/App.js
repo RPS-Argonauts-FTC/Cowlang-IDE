@@ -55,9 +55,8 @@ function App() {
     const [blockCodeEditor, setBlockCodeEditor] = React.useState(null);
 
     useEffect(() => {
-
         setBlockCodeEditor(
-            <div style={{height: 5000, width: "100vw", backgroundColor: "#202020", marginTop: 5}}>
+            <div id="editor-blocks" style={{height: 5000, width: "100vw", backgroundColor: "#191919", marginTop: 5, paddingLeft: 10}}>
                 {blocks.map((block, index) => {
                     return <MDBSortableElement key={index}>{block}</MDBSortableElement>
                 })}
@@ -66,7 +65,28 @@ function App() {
 
         setTimeout(() => {
             setBlockCodeEditor(
-                <MDBSortable style={{height: 5000, width: "100vw", backgroundColor: "#202020", marginTop: 5}}>
+                <MDBSortable id="editor-blocks" style={{height: 5000, width: "100vw", backgroundColor: "#191919", marginTop: 5, paddingLeft: 10}}
+                    onMouseLeave={(e) => {
+                        let currentOrderBlocksInID = Array.from(document.getElementById("editor-blocks").children).map((block) => {
+                            return block.children[0].id;
+                        });
+
+                        let newBlocks = [];
+
+                        for (var blockID of currentOrderBlocksInID) {
+                            for (var block of blocks) {
+                                if (block.props.data.idx === blockID) {
+                                    newBlocks.push(block);
+                                }
+                            }
+                        }
+
+                        console.log(newBlocks);
+
+                        setBlocks(newBlocks);
+                        
+                    }}
+                >
                     {blocks.map((block, index) => {
                         return <MDBSortableElement key={index}>{block}</MDBSortableElement>
                     })}
@@ -370,7 +390,7 @@ function App() {
                                         className="rounded-5"
                                         style={{
                                             height: "400px",
-                                            backgroundColor: "#202020",
+                                            backgroundColor: "#191919",
                                         }}
                                         acceptedExtensions={[".cow"]}
                                         defaultMessage={
@@ -386,9 +406,8 @@ function App() {
                 <MDBModal show={showLineCodeDocs} setShow={setShowLineCodeDocs} onShow={() => {
                     reformatTextbox("docs");
                 }}>
-                    <MDBModalDialog>
+                    <MDBModalDialog size="lg" scrollable>
                         <MDBModalContent style={{ backgroundColor: "#292929" }}>
-
                             <MDBModalHeader>
                                 <MDBModalTitle style={{ color: "white" }}>
                                     Cowlang Editor Documentation
@@ -396,7 +415,7 @@ function App() {
                             </MDBModalHeader>
 
                             <MDBModalBody>
-                                <div id="docs" contentEditable={false} style={{ height: "400px", overflowY: "scroll" }}>
+                                <div id="docs" contentEditable={false} style={{ overflowY: "show" }}>
                                     /* The Cowlang programming language is a simple, instruction-based language with the following commands. */
 
 Drive.Forward(tiles, speed);- tiles: tiles to go forward, speed: speed of robot [0, 1] <br/>
@@ -422,12 +441,11 @@ Delay(seconds); - seconds to delay<br/>
                 </MDBModal>
 
                 <div className="text-center mt-2">
-
-                    <h3 className="mb-1 mt-5">Cowlang IDE</h3>
+                    <h3 className="mb-1 mt-5">🐮Cowlang IDE🐮</h3>
                     <span>Editing </span>
                     <input
                         className="mt-2"
-                        style={{borderRadius: 5, backgroundColor: "#202020", color: "#f5f7ff", border: "none", paddingLeft: 5, width: "auto"}}
+                        style={{borderRadius: 5, backgroundColor: "#191919", color: "#fff", border: "none", paddingLeft: 5, width: "auto"}}
                         value={fileName}
                         onChange={(e) => {
                             var newFileName = e.target.value;
@@ -436,18 +454,18 @@ Delay(seconds); - seconds to delay<br/>
                     />
                     <span>.cow</span>
 
-                    <MDBContainer className="mt-4">
+                    <MDBContainer style={{top: 50}}>
                         <MDBBtn
                             outline
                             className="me-2"
                             color="light"
                             style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
+                                // position: "absolute",
+                                // top: 0,
+                                // left: 0,
                                 height: 47,
                                 border: "none",
-                                // backgroundColor: "#202020",
+                                // backgroundColor: "#191919",
                                 borderRadius: "0px",
                             }}
                             onClick={() => {
@@ -461,12 +479,12 @@ Delay(seconds); - seconds to delay<br/>
                             id="down-btn"
                             color="light"
                             style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 60,
+                                // position: "absolute",
+                                // top: 0,
+                                // left: 60,
                                 height: 47,
                                 border: "none",
-                                // backgroundColor: "#202020",
+                                // backgroundColor: "#191919",
                                 borderRadius: "0px",
                             }}
                             onClick={() => {
@@ -500,7 +518,9 @@ Delay(seconds); - seconds to delay<br/>
                             <MDBIcon icon="download" className="me-2" />
                             {/* Download "{fileName}.cow" */}
                         </MDBBtn>
-                        <MDBBtn
+                    </MDBContainer>
+
+                    <MDBBtn
                             outline
                             className="me-2"
                             color="link"
@@ -528,7 +548,6 @@ Delay(seconds); - seconds to delay<br/>
                             <MDBIcon icon="trash" className="me-2" />
                             Reset
                         </MDBBtn>
-                    </MDBContainer>
 
                     <MDBTabs>
                          {/* style={{ position: "absolute", top: 0, left: 0 }}> */}
@@ -572,10 +591,11 @@ Delay(seconds); - seconds to delay<br/>
                                             height: 5000,
                                             width: "100vw",
                                             marginTop: 5,
-                                            backgroundColor: "#202020",
+                                            backgroundColor: "#191919",
                                             textAlign: "left",
                                             paddingTop: 10,
                                             paddingBottom: 50,
+                                            paddingLeft: 10,
                                             border: "none",
                                         }}
                                     >
