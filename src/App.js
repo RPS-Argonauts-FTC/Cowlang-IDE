@@ -436,7 +436,7 @@ Delay(seconds); - seconds to delay<br/>
                 </MDBModal>
 
                 <div className="text-center mt-2">
-                    <h3 className="mb-1 mt-5">🐮Cowlang IDE🐮</h3>
+                    <h3 className="mb-1 mt-5"><img width="32" height="32" src="https://media.discordapp.net/attachments/1038918930464518154/1042900942917476442/logo512.png" style={{display: 'inline'}}/> Cowlang IDE</h3>
                     <span>Editing </span>
                     <input
                         className="mt-2"
