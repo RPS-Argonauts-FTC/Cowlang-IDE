@@ -81,7 +81,7 @@ function App() {
                             }
                         }
 
-                        console.log(newBlocks);
+                        // console.log(newBlocks);
 
                         setBlocks(newBlocks);
                         
