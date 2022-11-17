@@ -461,12 +461,12 @@ Delay(seconds); - seconds to delay<br/>
                             color="light"
                             style={{
                                 // position: "absolute",
-                                // top: 0,
+                                top: 10,
                                 // left: 0,
-                                height: 47,
+                                height: 40,
                                 border: "none",
-                                // backgroundColor: "#191919",
-                                borderRadius: "0px",
+                                backgroundColor: "#191919",
+                                borderRadius: "25px",
                             }}
                             onClick={() => {
                                 setOpenFileUploadDialog(true);
@@ -482,10 +482,11 @@ Delay(seconds); - seconds to delay<br/>
                                 // position: "absolute",
                                 // top: 0,
                                 // left: 60,
-                                height: 47,
+                                top: 10,
+                                height: 40,
                                 border: "none",
-                                // backgroundColor: "#191919",
-                                borderRadius: "0px",
+                                backgroundColor: "#191919",
+                                borderRadius: "25px",
                             }}
                             onClick={() => {
                                 var newFileName = fileName;
@@ -515,7 +516,7 @@ Delay(seconds); - seconds to delay<br/>
                                 document.body.removeChild(element);
                             }}
                         >
-                            <MDBIcon icon="download" className="me-2" />
+                            <MDBIcon icon="download" className="me-0" />
                             {/* Download "{fileName}.cow" */}
                         </MDBBtn>
                     </MDBContainer>
@@ -549,7 +550,7 @@ Delay(seconds); - seconds to delay<br/>
                             Reset
                         </MDBBtn>
 
-                    <MDBTabs>
+                    <MDBTabs style={{alignSelf: "center"}}>
                          {/* style={{ position: "absolute", top: 0, left: 0 }}> */}
                         <MDBTabsItem>
                             <MDBTabsLink

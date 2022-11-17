@@ -27,7 +27,7 @@ const blockBackgroundURL =
 const commentBlockBackgroundURL =
     "https://media.discordapp.net/attachments/829319361843036200/1042428453120659537/Rectangle_17.png";
 const sunnyBlockBackgroundURL =
-    "https://media.discordapp.net/attachments/829319361843036200/1042239852281864322/DontQuestion.png";
+    "https://media.discordapp.net/attachments/829319361843036200/1042639117529403484/DontQuestion.png";
 const clawBlockBackgroundURL =
     "https://media.discordapp.net/attachments/829319361843036200/1042428135372754974/Rectangle_15.png";
 const viperBlockBackgroundURL =
@@ -301,13 +301,13 @@ export const SunnyPark = ({ container, data = {speed: 100} }) => {
                 size="md"
                 style={{ paddingTop: 20 }}
             >
-                <MDBRow style={{color: "#ff00d3"}}>
+                <MDBRow style={{color: "#404040"}}>
                     {/* <MDBIcon icon="parking" className="me-2"/> */}
-                    <p>박순호</p>
+                    {/* <p>박순호</p> */}
                 </MDBRow>
             </MDBCol>
                 <MDBCol className="" size="md">
-                    <p style={{color: "#ff00d3"}}>% Speed</p>
+                    <p style={{color: "#fff"}}>% Speed</p>
                     <input
                         type="number"
                         min={1}
@@ -323,7 +323,7 @@ export const SunnyPark = ({ container, data = {speed: 100} }) => {
                             height: 40,
                             marginTop: -10,
                             borderRadius: 5,
-                            color: "#ff00d3",
+                            color: "#fff",
                         }}
                     />
                 </MDBCol>
