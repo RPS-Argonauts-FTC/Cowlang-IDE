@@ -18,6 +18,7 @@ import {
     MDBModalHeader,
     MDBModalTitle,
     MDBRow,
+    MDBScrollbar,
     MDBTabs,
     MDBTabsContent,
     MDBTabsItem,
@@ -26,9 +27,9 @@ import {
 } from "mdb-react-ui-kit";
 import { MDBWysiwyg } from "mdb-react-wysiwyg";
 import { MDBFileUpload } from "mdb-react-file-upload";
-import { MDBDraggable } from "mdb-react-drag-and-drop";
 
 import { ClawClose, ClawOpen, Comment, MoveBackwards, MoveForwards, MoveLeft, MoveRight, SunnyPark, TurnLeft, TurnRight, ViperGoTo, Delay } from "./blocks/Blocks";
+import { MDBSortable, MDBSortableElement } from "mdb-react-drag-and-drop";
 
 function App() {
     const [openFileUploadDialog, setOpenFileUploadDialog] =
@@ -45,30 +46,39 @@ function App() {
         global.blocks = blocks;
     }, [blocks]);
 
-    const [editorDimentions, setEditorDimentions] = React.useState({ width: "98vw", height: "100vh", position: "absolute", top: "0", left: "0"});
-
     const [mode, setMode] = React.useState("Line Code");
 
     const [showLineCodeDocs, setShowLineCodeDocs] = React.useState(false);
 
     const blockCodeContainer = React.useRef(null);
 
+    const [blockCodeEditor, setBlockCodeEditor] = React.useState(null);
+
+    useEffect(() => {
+
+        setBlockCodeEditor(
+            <div style={{height: 5000, width: "100vw", backgroundColor: "#202020", marginTop: 5}}>
+                {blocks.map((block, index) => {
+                    return <MDBSortableElement key={index}>{block}</MDBSortableElement>
+                })}
+            </div>
+        );
+
+        setTimeout(() => {
+            setBlockCodeEditor(
+                <MDBSortable style={{height: 5000, width: "100vw", backgroundColor: "#202020", marginTop: 5}}>
+                    {blocks.map((block, index) => {
+                        return <MDBSortableElement key={index}>{block}</MDBSortableElement>
+                    })}
+                </MDBSortable>
+            );
+        }, 50);
+    }, [blocks]);
+
     const reformatBlocks = () => {
         var lines = document.getElementById("editor").innerText.replace(/   [0-9]*\s*   ?/g, "<br/>").replace(" ", "").split("<br/>");
 
         var tobe = [];
-
-        // tobe.push(<Comment container={blockCodeContainer} data={{comment: "[FILETYPE=COWLANG]"}} />);
-
-        // console.log(commentables);
-
-        // for (var i = 1; i < commentables.length; i += 2)
-        // {
-        //     if (commentables[i] !== "")
-        //     {
-        //         tobe.push(<Comment container={blockCodeContainer} data={{comment: commentables[i]}} />);
-        //     }
-        // }
 
         var comment = "";
 
@@ -204,9 +214,7 @@ function App() {
             }
         }
 
-        document.getElementsByClassName(
-            "wysiwyg-content"
-        )[0].innerText = content;
+        document.getElementById("editor").innerText = content;
     };
 
     const reformatTextbox = (id = "editor") => {
@@ -285,9 +293,9 @@ function App() {
 
         if (id === "editor")
         {
-            document.getElementsByClassName(
-                "wysiwyg-content"
-            )[0].innerHTML = content;
+            document.getElementById(
+                "editor"
+            ).innerHTML = content;
         }
         else {
             document.getElementById(id).innerHTML = content;
@@ -311,7 +319,7 @@ function App() {
 
     return (
         <div
-            style={{ backgroundColor: "#232323", color: "#f5f7ff", width: "100%", height: "100%" }}
+            style={{ backgroundColor: "#121212", color: "#f5f7ff", width: "100%", height: "100%" }}
         >
             <div
                 className="d-flex justify-content-center"
@@ -348,10 +356,13 @@ function App() {
                                             read.readAsBinaryString(files[0]);
 
                                             read.onloadend = function () {
-                                                document.getElementsByClassName(
-                                                    "wysiwyg-content"
-                                                )[0].innerText = read.result;
-                                                setMode("Line Code");
+                                                document.getElementById(
+                                                    "editor"
+                                                ).innerText = read.result;
+
+                                                reformatTextbox();
+                                                reformatBlocks();
+
                                                 setOpenFileUploadDialog(false);
                                             };
                                         }}
@@ -359,7 +370,7 @@ function App() {
                                         className="rounded-5"
                                         style={{
                                             height: "400px",
-                                            backgroundColor: "#303030",
+                                            backgroundColor: "#202020",
                                         }}
                                         acceptedExtensions={[".cow"]}
                                         defaultMessage={
@@ -413,12 +424,10 @@ Delay(seconds); - seconds to delay<br/>
                 <div className="text-center mt-2">
 
                     <h3 className="mb-1 mt-5">Cowlang IDE</h3>
-                    <p className="mb-0 pb-0">
-                        A light-weight IDE made for FTC programming.
-                    </p>
+                    <span>Editing </span>
                     <input
-                        className="mt-4"
-                        style={{borderRadius: 5, backgroundColor: "#303030", color: "#f5f7ff", border: "none", paddingLeft: 5, width: "auto"}}
+                        className="mt-2"
+                        style={{borderRadius: 5, backgroundColor: "#202020", color: "#f5f7ff", border: "none", paddingLeft: 5, width: "auto"}}
                         value={fileName}
                         onChange={(e) => {
                             var newFileName = e.target.value;
@@ -426,60 +435,6 @@ Delay(seconds); - seconds to delay<br/>
                         }}
                     />
                     <span>.cow</span>
-                    {mode === "Line Code" && <MDBDropdown className='shadow-0' style={{position: "fixed", right: 125, top: 25, bottom: 25, overflowY: "scroll"}}>
-                                <MDBDropdownMenu alwaysOpen style={{borderRadius: 10}}>
-                                    <MDBDropdownItem link onClick={() => {
-                                        setShowLineCodeDocs(true);
-                                    }}>Documentation</MDBDropdownItem>
-                                    <MDBDropdownItem link onClick={() => {
-                                document.getElementsByClassName(
-                                    "wysiwyg-content"
-                                )[0].innerText = `
-/*
-On Autonomous Begin
-*/
-Drive.Forward(1, 100);
-Drive.Backward(1, 100);
-
-Drive.Right(1, 100);
-Drive.Left(1, 100);
-
-Drive.TurnRight(90, 100);
-Drive.TurnLeft(90, 100);
-
-Drive.SunnyPark(100);
-
-Claw.Open();
-Claw.Close();
-
-Viper.GoTo(High);
-
-Delay(1);`;}}>Load Example</MDBDropdownItem>
-                        {/* <i style={{ color: "#bcf2a2" }}>
--=-=-=-=-=-| Syntax |-=-=-=-=-=-  <br/>
-The Cowlang programming language is a simple, instruction-based language with the following commands. <br/>
-<br/>
-Drive.Forward(tiles, speed); - drive forwards by tiles [1, 50] @ speed [0, 100] %  <br/>
-Drive.Backward(tiles, speed); - drive backwards by tiles [1, 50]  @ speed [0, 100] %  <br/>
-Drive.Left(tiles, speed); - drive left by tiles [1, 50]  @ speed [0, 100] %  <br/>
-Drive.Right(tiles, speed); - drive right by tiles [1, 50]  @ speed [0, 100] %  <br/>
-<br/>
-Drive.TurnLeft(degrees, speed); - turns left by degrees  @ speed [0, 100] %  <br/>
-Drive.TurnRight(degrees, speed); - turns right by degrees  @ speed [0, 100] %  <br/>
-<br/>
-Drive.SunnyPark(speed); - parks to designated zone scanned OnInit from where robot is on field rn   @ speed [0, 100] %  <br/>
-<br/>
-Claw.Open(); - set claw to open; if already open, ignored <br/>
-Claw.Close(); - set claw to open; if already open, ignored  <br/>
-<br/>
-Viper.GoTo(position); - set viper to position, can be a string from [Ground, Low, Medium, High] or an integer value <br/>
-<br/>
--=-=-=-=-=-| Advanced |-=-=-=-=-=-   <br/>
-Adding a ! before a function, eg !Drive.Right(tiles, speed); will make it flagged, and will not be transpiled with right-to-left. <br/>
-Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in a separate thread. (will run next command with current) <br/>
-                        </i> */}
-                        </MDBDropdownMenu>
-                    </MDBDropdown>}
 
                     <MDBContainer className="mt-4">
                         <MDBBtn
@@ -492,7 +447,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                 left: 0,
                                 height: 47,
                                 border: "none",
-                                // backgroundColor: "#303030",
+                                // backgroundColor: "#202020",
                                 borderRadius: "0px",
                             }}
                             onClick={() => {
@@ -511,7 +466,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                 left: 60,
                                 height: 47,
                                 border: "none",
-                                // backgroundColor: "#303030",
+                                // backgroundColor: "#202020",
                                 borderRadius: "0px",
                             }}
                             onClick={() => {
@@ -532,7 +487,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                     "data:text/plain;charset=utf-8, " +
                                         encodeURIComponent(
                                             document.getElementById("editor")
-                                                .innerText.replace(/   [0-9]*\s*   ?/g, "\n")
+                                                .innerText.replaceAll(/( |\s)+[0-9]*( |\s)+?/g, "\n")
                                         )
                                 );
                                 element.setAttribute("download", newFileName);
@@ -559,11 +514,12 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                 backgroundColor: "#fff",
                                 color: "red",
                                 borderRadius: "15px",
+                                zIndex: 1000
                             }}
                             onClick={() => {
-                                document.getElementsByClassName(
-                                    "wysiwyg-content"
-                                )[0].innerText = `/*\nOn Autonomous Begin\n\n*/`;
+                                document.getElementById(
+                                    "editor"
+                                ).innerText = `/*\nOn Autonomous Begin\n\n*/`;
                                 setBlocks([]);
                                 reformatTextbox();
                                 reformatBlocks();
@@ -581,7 +537,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                 onClick={() => setMode("Line Code")}
                                 style={{
                                     color: "white",
-                                    backgroundColor: "#232323",
+                                    backgroundColor: "#121212",
                                 }}
                                 active={mode === "Line Code"}
                             >
@@ -593,179 +549,225 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                 onClick={() => setMode("Block Code")}
                                 style={{
                                     color: "white",
-                                    backgroundColor: "#232323",
+                                    backgroundColor: "#121212",
                                 }}
                                 active={mode === "Block Code"}
                             >
                                 <MDBIcon icon="th-large" className="me-0" />
                             </MDBTabsLink>
                         </MDBTabsItem>
-                    </MDBTabs>
 
-                    <MDBTabs>
                         <MDBTabsContent>
                             <MDBTabsPane show={true}>
                                 <div 
                                 style={{display: mode === "Line Code" ? "block" : "none"}}
                                 onMouseLeave = {(event) => {
                                     reformatTextbox();
-                                    // console.log(event.code.toLowerCase());
-                                    // if (!event.code.toLowerCase().includes("semicolon")){return;}
-                                    // global.lastKeyDown = (new Date).getTime();
-                                    // const last = global.lastKeyDown;
-
-                                    // setTimeout(() => {
-                                    //     if (global.lastKeyDown != last){return;}
-                                    //     // const beforePos = document.getElementsByClassName("wysiwyg-content")[0].selectionStart;
-                                    //     // const beforePos2 = document.getElementsByClassName("wysiwyg-content")[0].selectionEnd;
-                                    //     // console.log(beforePos);
-                                    //     reformatTextbox();
-                                    //     // document.getElementsByClassName("wysiwyg-content")[0].selectionStart = beforePos;
-                                    //     // document.getElementsByClassName("wysiwyg-content")[0].selectionEnd = beforePos2;
-                                    // }, 100);
                                 }}
                                 >
-                                    <MDBWysiwyg
+                                    <div
                                         id="editor"
-                                        disableStyles
-                                        disableFormatting
-                                        disableLists
-                                        disableLinks
-                                        disableCode
+                                        contentEditable
                                         style={{
-                                            height: "auto",
-                                            width: "98vw",
-                                            marginTop: -20,
-                                            backgroundColor: "#303030",
+                                            height: 5000,
+                                            width: "100vw",
+                                            marginTop: 5,
+                                            backgroundColor: "#202020",
                                             textAlign: "left",
+                                            paddingTop: 10,
                                             paddingBottom: 50,
                                             border: "none",
                                         }}
-                                        className="rounded-5"
                                     >
-                                    </MDBWysiwyg>
+                                    </div>
                                 </div>
+                                {mode === "Line Code" && <MDBDropdown dropup className='shadow-0' style={{position: "fixed", right: 115, top: 25, zIndex: 1000}}>
+                                <MDBDropdownMenu alwaysOpen style={{borderRadius: 10, backgroundColor: "#404040",colors: "#fff", paddingTop: 5, paddingBottom: 5}}>
+                                    <MDBDropdownItem header><b style={{color: "white"}}>References</b></MDBDropdownItem>
+                                    <div style={{height: 1, backgroundColor: "#808080", width: "100%", marginTop: 5, marginBottom: 5}}/>
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={() => {
+                                        setShowLineCodeDocs(true);
+                                    }}>
+                                        <span style={{color: "white"}}>Documentation</span>
+                                    </MDBDropdownItem>
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={() => {
+                                document.getElementById(
+                                    "editor"
+                                ).innerText = `
+/*
+On Autonomous Begin
+*/
+Drive.Forward(1, 100);
+Drive.Backward(1, 100);
+
+Drive.Right(1, 100);
+Drive.Left(1, 100);
+
+Drive.TurnRight(90, 100);
+Drive.TurnLeft(90, 100);
+
+Drive.SunnyPark(100);
+
+Claw.Open();
+Claw.Close();
+
+Viper.GoTo(High);
+
+Delay(1);`;
+                                reformatTextbox();
+}}>
+    <span style={{color: "white"}}>
+        Load Example
+    </span>
+</MDBDropdownItem>
+                        {/* <i style={{ color: "#bcf2a2" }}>
+-=-=-=-=-=-| Syntax |-=-=-=-=-=-  <br/>
+The Cowlang programming language is a simple, instruction-based language with the following commands. <br/>
+<br/>
+Drive.Forward(tiles, speed); - drive forwards by tiles [1, 50] @ speed [0, 100] %  <br/>
+Drive.Backward(tiles, speed); - drive backwards by tiles [1, 50]  @ speed [0, 100] %  <br/>
+Drive.Left(tiles, speed); - drive left by tiles [1, 50]  @ speed [0, 100] %  <br/>
+Drive.Right(tiles, speed); - drive right by tiles [1, 50]  @ speed [0, 100] %  <br/>
+<br/>
+Drive.TurnLeft(degrees, speed); - turns left by degrees  @ speed [0, 100] %  <br/>
+Drive.TurnRight(degrees, speed); - turns right by degrees  @ speed [0, 100] %  <br/>
+<br/>
+Drive.SunnyPark(speed); - parks to designated zone scanned OnInit from where robot is on field rn   @ speed [0, 100] %  <br/>
+<br/>
+Claw.Open(); - set claw to open; if already open, ignored <br/>
+Claw.Close(); - set claw to open; if already open, ignored  <br/>
+<br/>
+Viper.GoTo(position); - set viper to position, can be a string from [Ground, Low, Medium, High] or an integer value <br/>
+<br/>
+-=-=-=-=-=-| Advanced |-=-=-=-=-=-   <br/>
+Adding a ! before a function, eg !Drive.Right(tiles, speed); will make it flagged, and will not be transpiled with right-to-left. <br/>
+Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in a separate thread. (will run next command with current) <br/>
+                        </i> */}
+                        </MDBDropdownMenu>
+                    </MDBDropdown>}
                             </MDBTabsPane>
                             <MDBTabsPane
                                 show={mode === "Block Code"}
                             >
-                                {mode === "Block Code" && <section ref={blockCodeContainer} style={{height: "10000px", width: "98vw", backgroundColor: "#303030", borderRadius: "5px", marginTop: 5}}>
-                                    {blocks}
-                              </section>}
-                              {mode === "Block Code" && <MDBDropdown className='shadow-0' style={{position: "fixed", right: 125, top: 25}}>
-                                <MDBDropdownMenu alwaysOpen style={{borderRadius: 10}}>
-                                    <MDBDropdownItem link onClick={
+                                {mode === "Block Code" && blockCodeEditor}
+                              {mode === "Block Code" && <MDBDropdown dropup className='shadow-0' style={{position: "fixed", right: 115, top: 25, zIndex: 1000}}>
+                                <MDBDropdownMenu alwaysOpen style={{borderRadius: 10, backgroundColor: "#404040",colors: "#fff", paddingTop: 5, paddingBottom: 5}}>
+                                    <MDBDropdownItem header>
+                                        <b style={{color: "white"}}>Add Blocks</b>
+                                    </MDBDropdownItem>
+                                    <div style={{height: 1, backgroundColor: "#808080", width: "100%", marginTop: 5, marginBottom: 5}}/>
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<Comment container={blockCodeContainer} data={{comment: ""}} />);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Comment
+                                        <span style={{color: "white"}}>Comment</span>
                                     </MDBDropdownItem>
-                                    <MDBDropdownItem link onClick={
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<Delay container={blockCodeContainer} data={{seconds: 1}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Delay
+                                        <span style={{color: "white"}}>Delay</span>
                                     </MDBDropdownItem>
-                                    <MDBDropdownItem divider />
-                                    <MDBDropdownItem link onClick={
+                                    <div style={{height: 1, backgroundColor: "#808080", width: "100%", marginTop: 5, marginBottom: 5}}/>
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<MoveForwards container={blockCodeContainer} data={{tiles: 1, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Forward
+                                        <span style={{color: "white"}}>Forward</span>
                                     </MDBDropdownItem>
-                                    <MDBDropdownItem link onClick={
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<MoveBackwards container={blockCodeContainer} data={{tiles: 1, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Backward
+                                        <span style={{color: "white"}}>Backward</span>
                                     </MDBDropdownItem> 
-                                    <MDBDropdownItem link onClick={
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<MoveLeft container={blockCodeContainer} data={{tiles: 1, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Left
+                                        <span style={{color: "white"}}>Left</span>
                                     </MDBDropdownItem>
-                                    <MDBDropdownItem link onClick={
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<MoveRight container={blockCodeContainer} data={{tiles: 1, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Right
+                                        <span style={{color: "white"}}>Right</span>
                                     </MDBDropdownItem>
-                                    <MDBDropdownItem divider />
-                                    <MDBDropdownItem link onClick={
+                                    <div style={{height: 1, backgroundColor: "#808080", width: "100%", marginTop: 5, marginBottom: 5}}/>
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<TurnLeft container={blockCodeContainer} data={{degrees: 90, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Turn Left
+                                        <span style={{color: "white"}}>Turn Left</span>
                                     </MDBDropdownItem>
-                                    <MDBDropdownItem link  onClick={
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}}  onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<TurnRight container={blockCodeContainer} data={{degrees: 90, speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Turn Right
+                                        <span style={{color: "white"}}>Turn Right</span>
                                     </MDBDropdownItem>
-                                    <MDBDropdownItem divider />
-                                    <MDBDropdownItem link  onClick={
+                                    <div style={{height: 1, backgroundColor: "#808080", width: "100%", marginTop: 5, marginBottom: 5}}/>
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}}  onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<SunnyPark container={blockCodeContainer} data={{speed: 100}}/>);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Sunny Park
+                                        <span style={{color: "white"}}>Sunny Park</span>
                                     </MDBDropdownItem>
-                                    <MDBDropdownItem divider />
-                                    <MDBDropdownItem link onClick={
+                                    <div style={{height: 1, backgroundColor: "#808080", width: "100%", marginTop: 5, marginBottom: 5}}/>
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<ClawOpen container={blockCodeContainer} data={{}} />);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Open Claw
+                                        <span style={{color: "white"}}>Open Claw</span>
                                     </MDBDropdownItem>
-                                    <MDBDropdownItem link onClick={
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<ClawClose container={blockCodeContainer} data={{}} />);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Close Claw
+                                        <span style={{color: "white"}}>Close Claw</span>
                                     </MDBDropdownItem>
-                                    <MDBDropdownItem divider />
-                                    <MDBDropdownItem link onClick={
+                                    <div style={{height: 1, backgroundColor: "#808080", width: "100%", marginTop: 5, marginBottom: 5}}/>
+                                    <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={
                                         () => {
                                             const newBlocks = [...blocks];
                                             newBlocks.push(<ViperGoTo container={blockCodeContainer} data={{pos: "High"}} />);
                                             setBlocks(newBlocks);
                                         }
                                     }>
-                                        Viper Go To
+                                        <span style={{color: "white"}}>Viper Go To</span>
                                     </MDBDropdownItem>
                                 </MDBDropdownMenu>
                               </MDBDropdown>}

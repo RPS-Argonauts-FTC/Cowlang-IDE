@@ -20,18 +20,18 @@ import {
     MDBTabsLink,
     MDBTabsPane,
 } from "mdb-react-ui-kit";
-import { MDBDraggable } from "mdb-react-drag-and-drop";
+import { MDBSortableElement } from "mdb-react-drag-and-drop";
 
 const blockBackgroundURL =
-    "https://media.discordapp.net/attachments/1018552807508410409/1041781682317033532/Rectangle_9-3.png";
+    "https://media.discordapp.net/attachments/829319361843036200/1042428135645388861/Rectangle_14.png";
 const commentBlockBackgroundURL =
-    "https://media.discordapp.net/attachments/1018552807508410409/1041826366745759754/Puzzle_Comment.png";
+    "https://media.discordapp.net/attachments/829319361843036200/1042428453120659537/Rectangle_17.png";
 const sunnyBlockBackgroundURL =
-    "https://media.discordapp.net/attachments/829319361843036200/1042239852281864322/DontQuestion.png?width=1200&height=520";
+    "https://media.discordapp.net/attachments/829319361843036200/1042239852281864322/DontQuestion.png";
 const clawBlockBackgroundURL =
-    "https://media.discordapp.net/attachments/1018552807508410409/1041923863182852127/Rectangle_12.png";
+    "https://media.discordapp.net/attachments/829319361843036200/1042428135372754974/Rectangle_15.png";
 const viperBlockBackgroundURL =
-    "https://media.discordapp.net/attachments/1018552807508410409/1041926786105217124/Rectangle_13.png";
+    "https://media.discordapp.net/attachments/829319361843036200/1042428135020441721/Rectangle_16.png";
 
 var uuid = require("uuid");
 
@@ -52,7 +52,7 @@ const getUniqueID = () => {
 const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
 
     const [close, setClosed] = React.useState(false);
-    const [hovered, setHovered] = React.useState(false);
+    const [hovered, setHovered] = React.useState(true);
 
     if (close)
     {
@@ -77,15 +77,14 @@ const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
         // <div
             
         // >
-            <MDBDraggable
-                container={container}
+            <div
+                // container={container}
                 style={{
                     fontSize: 12,
-                    color: "#404040",
+                    color: "#fff",
                     width: 300,
                     height: 94,
                     borderRadius: "5px",
-                    // backgroundColor: "rgba(255, 255, 255, 0.25)",
                     overflow: "show"
                 }}
 
@@ -93,17 +92,19 @@ const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
                     setHovered(true);
                 }}
                 onMouseLeave={() => {
-                    setHovered(false);
+                    // setHovered(false);
                 }}
             >
                 <img src={url} style={{width: "100%", height: 110, marginTop: 0, left: 0}} />
                 <div style={{marginTop: -100}}>
-                    { hovered && <a style={{color: "red", position: "absolute", left: 5, top: 40, width: 5, height: 5}} onClick={() => {
-                        setClosed(true);
-                    }}><MDBIcon icon="trash" size="sm"/></a>}
+                    {/* <div>
+                        {hovered && <a style={{color: "#404040", right: 5}} onClick={() => {
+                            setClosed(true);
+                        }}><MDBIcon icon="trash" size="sm" /></a>}
+                    </div> */}
                     {props.children}
                 </div>
-            </MDBDraggable>
+            </div>
         // </div>
     );
 }
@@ -136,7 +137,6 @@ const MoveBlockTemplate = ({ direction, inputLabel = ["Tiles", "% Speed"], icon 
                     <input
                         type="number"
                         min={1}
-                        max={50}
                         defaultValue={data.param1}
                         onChange={(e) => {
                             data.param1 = e.target.value;
@@ -144,12 +144,12 @@ const MoveBlockTemplate = ({ direction, inputLabel = ["Tiles", "% Speed"], icon 
                         }}
                         style={{
                             border: "none",
-                            backgroundColor: "rgba(255, 255, 255, 0.5)",
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
                             width: 40,
                             height: 40,
                             marginTop: -10,
                             borderRadius: 5,
-                            color: "#404040",
+                            color: "#fff",
                         }}
                     />
                 </MDBCol>
@@ -170,8 +170,8 @@ const MoveBlockTemplate = ({ direction, inputLabel = ["Tiles", "% Speed"], icon 
                             height: 40,
                             marginTop: -10,
                             borderRadius: 5,
-                            color: "#404040",
-                            backgroundColor: "rgba(255, 255, 255, 0.5)",
+                            color: "#fff",
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
                         }}
                     />
                 </MDBCol>
@@ -300,7 +300,7 @@ export const SunnyPark = ({ container, data = {speed: 100} }) => {
                 style={{ paddingTop: 20 }}
             >
                 <MDBRow style={{color: "#ff00d3"}}>
-                    <MDBIcon icon="parking" className="me-2"/>
+                    {/* <MDBIcon icon="parking" className="me-2"/> */}
                     <p>박순호</p>
                 </MDBRow>
             </MDBCol>
@@ -309,14 +309,14 @@ export const SunnyPark = ({ container, data = {speed: 100} }) => {
                     <input
                         type="number"
                         min={1}
-                        max={50}
+                        max={100}
                         onChange={(e) => {
                             data.speed = e.target.value;
                         }}
                         defaultValue={data.speed}
                         style={{
                             border: "none",
-                            backgroundColor: "rgba(255, 255, 255, 0.5)",
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
                             width: 40,
                             height: 40,
                             marginTop: -10,
@@ -362,11 +362,12 @@ export const Delay = ({ container, data = {seconds: 1} }) => {
                         }}
                         style={{
                             border: "none",
-                            backgroundColor: "rgba(255, 255, 255, 0.5)",
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
                             width: 40,
                             height: 40,
                             marginTop: -10,
                             borderRadius: 5,
+                            color: "white"
                         }}
                     />
                 </MDBCol>
@@ -393,11 +394,11 @@ export const ViperGoTo = ({ container, data = {pos: "High" }}) => {
             >
                 <MDBRow>
                     <MDBIcon icon={"angle-double-up"} />
-                    <p style={{color: "#000"}}>Viper</p>
+                    <p style={{color: "#fff"}}>Viper</p>
                 </MDBRow>
             </MDBCol>
                 <MDBCol className="" size="md">
-                    <p style={{color: "#000"}}>Go To</p>
+                    <p style={{color: "#fff"}}>Go To</p>
                     <input
                         defaultValue={data.pos}
                         onChange={(e) => {
@@ -405,12 +406,12 @@ export const ViperGoTo = ({ container, data = {pos: "High" }}) => {
                         }}
                         style={{
                             border: "none",
-                            backgroundColor: "rgba(255, 255, 255, 0.5)",
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
                             width: 100,
                             height: 40,
                             marginTop: -10,
                             borderRadius: 5,
-                            color: "#404040",
+                            color: "#fff",
                         }}
                     />
                 </MDBCol>
@@ -434,7 +435,7 @@ const ClawTemplate = ({label, container, data}) => {
             >
                 <MDBRow>
                     <MDBIcon icon={"door-" + String(label).replace("Close", "Closed").toLowerCase()} />
-                    <p style={{color: "#000"}}>Claw {label}</p>
+                    <p style={{color: "#fff"}}>Claw {label}</p>
                 </MDBRow>
             </MDBCol>
         </MDBRow>
@@ -484,8 +485,8 @@ export const Comment = ({ container, data = { comment: "" } }) => {
                     minWidth: "90%",
                     height: 55,
                     borderRadius: 5,
-                    backgroundColor: "rgba(255, 255, 255, 0.5)",
-                    color: "#000",
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    color: "#fff",
                 }}
                 defaultValue={data.comment}
             />
