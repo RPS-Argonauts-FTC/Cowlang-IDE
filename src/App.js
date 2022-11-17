@@ -81,8 +81,6 @@ function App() {
                             }
                         }
 
-                        // console.log(newBlocks);
-
                         setBlocks(newBlocks);
                         
                     }}
@@ -109,13 +107,11 @@ function App() {
 
             if (line.includes("/*") || line.includes("*/")){
                 if (inComment){
-                    // console.log("exit at " + i);
                     inComment = false;
                     tobe.push(<Comment container={blockCodeContainer} data={{comment: comment}} />);
                     comment = "";
                 }
                 else {
-                    // console.log("enter at " + i);
                     inComment = true;
                 }
                 continue;
@@ -178,12 +174,9 @@ function App() {
                 {
                     continue;
                 }
-                console.log(unable);
                 tobe.push(<Comment container={blockCodeContainer} data={{comment: line}} />);
             }
         }
-
-        // console.log(tobe);
 
         setBlocks(tobe);
     };
@@ -194,8 +187,6 @@ function App() {
         for (var block of blocks)
         {
             var data = block.props.data;
-
-            console.log(data);
 
             if (data.blockType === "Comment")
             {
@@ -241,6 +232,7 @@ function App() {
         var content = document.getElementById(id).innerText;
 
         content = content.replaceAll("\n", "<br />");
+        // content = content.replace(";", ";<br />");
 
         content = content.replace(/   [0-9]*\s*   ?/g, "")
 
@@ -503,13 +495,16 @@ Delay(seconds); - seconds to delay<br/>
                                 }
                                 reformatTextbox();
 
+                                var text = document.getElementById("editor").innerText.replaceAll(/( |\s)+[0-9]*( |\s)+?/g, "\n").replaceAll(";", ";\n");
+
+                                console.log(text);
+
                                 var element = document.createElement("a");
                                 element.setAttribute(
                                     "href",
                                     "data:text/plain;charset=utf-8, " +
                                         encodeURIComponent(
-                                            document.getElementById("editor")
-                                                .innerText.replaceAll(/( |\s)+[0-9]*( |\s)+?/g, "\n")
+                                            text
                                         )
                                 );
                                 element.setAttribute("download", newFileName);
