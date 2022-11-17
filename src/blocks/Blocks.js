@@ -100,7 +100,7 @@ const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
                 <img src={url} style={{width: "100%", height: 110, marginTop: 0, left: 0}} />
                 <div style={{marginTop: -100}}>
                     {/* <div>
-                        {hovered && <a style={{color: "#404040", right: 5}} onClick={() => {
+                        {hovered && <a style={{color: "#404040", right: 5, display: "inline"}} onClick={() => {
                             setClosed(true);
                         }}><MDBIcon icon="trash" size="sm" /></a>}
                     </div> */}

@@ -323,7 +323,10 @@ function App() {
     }
 
     useEffect(() => {
-        reformatTextbox();
+        setTimeout(() => {
+            document.getElementById("editor").innerHTML = "/*<br/>On Autonomous Begin<br/>*/<br/>";
+            reformatTextbox();
+        }, 100);
     }, []);
 
     useEffect(() => {
