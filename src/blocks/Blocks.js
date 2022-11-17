@@ -52,7 +52,7 @@ const getUniqueID = () => {
 const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
 
     const [close, setClosed] = React.useState(false);
-    const [hovered, setHovered] = React.useState(true);
+    const [hovered, setHovered] = React.useState(false);
 
     if (close)
     {
@@ -83,7 +83,7 @@ const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
                     fontSize: 12,
                     color: "#fff",
                     width: 300,
-                    height: 94,
+                    height: 100,
                     borderRadius: "5px",
                     overflow: "show"
                 }}
@@ -94,17 +94,17 @@ const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
                     setHovered(true);
                 }}
                 onMouseLeave={() => {
-                    // setHovered(false);
+                    setHovered(false);
                 }}
             >
-                <img src={url} style={{width: "100%", height: 110, marginTop: 0, left: 0}} />
-                <div style={{marginTop: -100}}>
-                    {/* <div>
-                        {hovered && <a style={{color: "#404040", right: 5, display: "inline"}} onClick={() => {
+                <img src={url} style={{width: "100%", height: 120, marginTop: 0, left: 0}} />
+                <div style={{marginTop: hovered ? -120 : -110}}>
+                    {hovered && <a style={{color: "red", display: "block"}} onClick={() => {
                             setClosed(true);
-                        }}><MDBIcon icon="trash" size="sm" /></a>}
-                    </div> */}
-                    {props.children}
+                    }}><MDBIcon icon="trash" size="sm" /></a>}
+                    <div>
+                        {props.children}
+                    </div>
                 </div>
             </div>
         // </div>
