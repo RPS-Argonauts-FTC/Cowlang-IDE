@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/Cowlang-IDE/static/css/main.2f95a355.css",
-    "main.js": "/Cowlang-IDE/static/js/main.c7f76877.js",
-    "static/js/787.08fa795f.chunk.js": "/Cowlang-IDE/static/js/787.08fa795f.chunk.js",
+    "main.js": "/Cowlang-IDE/static/js/main.7420e441.js",
+    "static/js/787.c718f8a9.chunk.js": "/Cowlang-IDE/static/js/787.c718f8a9.chunk.js",
     "index.html": "/Cowlang-IDE/index.html",
     "main.2f95a355.css.map": "/Cowlang-IDE/static/css/main.2f95a355.css.map",
-    "main.c7f76877.js.map": "/Cowlang-IDE/static/js/main.c7f76877.js.map",
-    "787.08fa795f.chunk.js.map": "/Cowlang-IDE/static/js/787.08fa795f.chunk.js.map"
+    "main.7420e441.js.map": "/Cowlang-IDE/static/js/main.7420e441.js.map",
+    "787.c718f8a9.chunk.js.map": "/Cowlang-IDE/static/js/787.c718f8a9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.2f95a355.css",
-    "static/js/main.c7f76877.js"
+    "static/js/main.7420e441.js"
   ]
 }
