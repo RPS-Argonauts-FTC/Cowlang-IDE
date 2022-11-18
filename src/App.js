@@ -30,6 +30,7 @@ import { MDBFileUpload } from "mdb-react-file-upload";
 
 import { ClawClose, ClawOpen, Comment, MoveBackwards, MoveForwards, MoveLeft, MoveRight, SunnyPark, TurnLeft, TurnRight, ViperGoTo, Delay } from "./blocks/Blocks";
 import { MDBSortable, MDBSortableElement } from "mdb-react-drag-and-drop";
+import { useQuill } from "react-quilljs";
 
 function App() {
     const [openFileUploadDialog, setOpenFileUploadDialog] =
@@ -53,6 +54,8 @@ function App() {
     const blockCodeContainer = React.useRef(null);
 
     const [blockCodeEditor, setBlockCodeEditor] = React.useState(null);
+
+    const { quill, quillRef } = useQuill();
 
     useEffect(() => {
         setBlockCodeEditor(
@@ -596,6 +599,14 @@ Delay(seconds); - seconds to delay<br/>
                                             paddingBottom: 50,
                                             paddingLeft: 10,
                                             border: "none",
+                                        }}
+
+                                        onKeyDown={(event) => {
+                                            console.log()
+                                        }}
+
+                                        onClick={(event) => {
+                                            console.log(window.getSelection());
                                         }}
                                     >
                                     </div>

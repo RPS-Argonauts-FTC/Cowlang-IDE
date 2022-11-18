@@ -27,7 +27,7 @@ const blockBackgroundURL =
 const commentBlockBackgroundURL =
     "https://media.discordapp.net/attachments/829319361843036200/1042428453120659537/Rectangle_17.png";
 const sunnyBlockBackgroundURL =
-    "https://media.discordapp.net/attachments/829319361843036200/1042639117529403484/DontQuestion.png";
+    "https://media.discordapp.net/attachments/829319361843036200/1042640637259948133/DontQuestion.png";
 const clawBlockBackgroundURL =
     "https://media.discordapp.net/attachments/829319361843036200/1042428135372754974/Rectangle_15.png";
 const viperBlockBackgroundURL =

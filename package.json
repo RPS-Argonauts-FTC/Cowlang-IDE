@@ -9,8 +9,10 @@
     "mdb-react-file-upload": "./plugins/file-upload.tgz",
     "mdb-react-ui-kit": "./mdb-react-ui-kit-5.0.0.tgz",
     "mdb-react-wysiwyg": "./plugins/wysiwyg-editor.tgz",
+    "quill": "^1.3.7",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
+    "react-quilljs": "^1.3.3",
     "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
   },
