@@ -97,7 +97,7 @@ const Drag = ({container, url = blockBackgroundURL, data, ...props}) => {
                     setHovered(false);
                 }}
             >
-                <img src={url} style={{width: "100%", height: 120, marginTop: 0, left: 0}} />
+                <img src={url} style={{width: "100%", height: 117, marginTop: 0, left: 0}} />
                 <div style={{marginTop: hovered ? -120 : -110}}>
                     {hovered && <a style={{color: "red", display: "block"}} onClick={() => {
                             setClosed(true);

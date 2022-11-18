@@ -59,7 +59,7 @@ function App() {
 
     useEffect(() => {
         setBlockCodeEditor(
-            <div id="editor-blocks" style={{height: 5000, width: "100vw", backgroundColor: "#191919", marginTop: 5, paddingLeft: 10}}>
+            <div id="editor-blocks" style={{height: 5000, width: "98vw", backgroundColor: "#191919", marginTop: 5, paddingLeft: 10}}>
                 {blocks.map((block, index) => {
                     return <MDBSortableElement key={index}>{block}</MDBSortableElement>
                 })}
@@ -68,7 +68,7 @@ function App() {
 
         setTimeout(() => {
             setBlockCodeEditor(
-                <MDBSortable id="editor-blocks" style={{height: 5000, width: "100vw", backgroundColor: "#191919", marginTop: 5, paddingLeft: 10}}
+                <MDBSortable id="editor-blocks" style={{height: 5000, width: "98vw", backgroundColor: "#191919", marginTop: 5, paddingLeft: 10}}
                     onMouseLeave={(e) => {
                         let currentOrderBlocksInID = Array.from(document.getElementById("editor-blocks").children).map((block) => {
                             return block.children[0].id;
@@ -581,17 +581,28 @@ Delay(seconds); - seconds to delay<br/>
                         <MDBTabsContent>
                             <MDBTabsPane show={true}>
                                 <div 
-                                style={{display: mode === "Line Code" ? "block" : "none"}}
-                                onMouseLeave = {(event) => {
-                                    reformatTextbox();
-                                }}
+                                    style={{display: mode === "Line Code" ? "block" : "none"}}
                                 >
+                                    <MDBBtn
+                                        style={{
+                                            position: "fixed",
+                                            bottom: 15,
+                                            right: 15,
+                                            backgroundColor: "#fff",
+                                            color: "blue",
+                                            height: 50,
+                                            borderRadius: "15px",
+                                        }}
+                                        onMouseLeave = {(event) => {
+                                            reformatTextbox();
+                                        }}
+                                    ><MDBIcon icon="sync" className="me-2"/>Sync Syntax Highlighting</MDBBtn>
                                     <div
                                         id="editor"
                                         contentEditable
                                         style={{
                                             height: 5000,
-                                            width: "100vw",
+                                            width: "98vw",
                                             marginTop: 5,
                                             backgroundColor: "#191919",
                                             textAlign: "left",
@@ -599,14 +610,6 @@ Delay(seconds); - seconds to delay<br/>
                                             paddingBottom: 50,
                                             paddingLeft: 10,
                                             border: "none",
-                                        }}
-
-                                        onKeyDown={(event) => {
-                                            console.log()
-                                        }}
-
-                                        onClick={(event) => {
-                                            console.log(window.getSelection());
                                         }}
                                     >
                                     </div>
