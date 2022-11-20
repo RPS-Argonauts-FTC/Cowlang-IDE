@@ -304,7 +304,12 @@ function App() {
 
         content = content.replaceAll("(", "<b style='color: #a834eb;'>(</b>").replaceAll(")", "<b style='color: #a834eb;'>)</b>");
 
-        content = content.split("<br />").map((line, index) => { return "<span class='me-0'>   </span><span style='color: #666666; font-style: normal; ' class='me-3'>" + index + " </span><span class='me-4'>   </span>" + line}).join("<br />");
+        content = content.split("<br />").map((line, index) => { if (line.match(/   [0-9]   /g)) {return line} else
+            {
+                return "<span class='me-0'>   </span><span style='color: #666666; font-style: normal; ' class='me-3'>" + index + " </span><span class=''>   </span>" + line
+            }}).join("<br />");
+
+        content = content.replaceAll("NaN", "0");
 
         if (id === "editor")
         {
@@ -487,6 +492,27 @@ Delay(seconds); - seconds to delay<br/>
                                 borderRadius: "25px",
                             }}
                             onClick={() => {
+
+                                const down = () => {
+                                    var text = document.getElementById("editor").innerText.replaceAll(/( |\s)+[0-9]*( |\s)+?/g, "\n").replaceAll(";", ";\n");
+
+                                    console.log(text);
+
+                                    var element = document.createElement("a");
+                                    element.setAttribute(
+                                        "href",
+                                        "data:text/plain;charset=utf-8, " +
+                                            encodeURIComponent(
+                                                text
+                                            )
+                                    );
+                                    element.setAttribute("download", newFileName);
+
+                                    document.body.appendChild(element);
+                                    element.click();
+                                    document.body.removeChild(element);
+                                }
+
                                 var newFileName = fileName;
                                 if (!newFileName.endsWith(".cow")) {
                                     newFileName += ".cow";
@@ -495,26 +521,19 @@ Delay(seconds); - seconds to delay<br/>
                                 if (mode === "Block Code")
                                 {
                                     recalculateTextbox();
+                                    reformatTextbox();
+                                    down();
                                 }
-                                reformatTextbox();
-
-                                var text = document.getElementById("editor").innerText.replaceAll(/( |\s)+[0-9]*( |\s)+?/g, "\n").replaceAll(";", ";\n");
-
-                                console.log(text);
-
-                                var element = document.createElement("a");
-                                element.setAttribute(
-                                    "href",
-                                    "data:text/plain;charset=utf-8, " +
-                                        encodeURIComponent(
-                                            text
-                                        )
-                                );
-                                element.setAttribute("download", newFileName);
-
-                                document.body.appendChild(element);
-                                element.click();
-                                document.body.removeChild(element);
+                                else {
+                                    reformatTextbox();
+                                    setMode("Block Code"); 
+                                    setTimeout(() => { 
+                                        setMode("Line Code"); 
+                                        setTimeout(() => {
+                                            down();
+                                        })
+                                    }, 100);
+                                }
                             }}
                         >
                             <MDBIcon icon="download" className="me-0" />
@@ -593,10 +612,12 @@ Delay(seconds); - seconds to delay<br/>
                                             height: 50,
                                             borderRadius: "15px",
                                         }}
-                                        onMouseLeave = {(event) => {
+                                        onClick = {(event) => {
                                             reformatTextbox();
+                                            setMode("Block Code");
+                                            setTimeout(() => { setMode("Line Code"); }, 100);
                                         }}
-                                    ><MDBIcon icon="sync" className="me-2"/>Sync Syntax Highlighting</MDBBtn>
+                                    ><MDBIcon icon="sync" className="me-2"/>Update Linting</MDBBtn>
                                     <div
                                         id="editor"
                                         contentEditable
