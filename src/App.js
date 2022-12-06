@@ -763,7 +763,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                     }>
                                         <span style={{color: "white"}}>Turn Right</span>
                                     </MDBDropdownItem>
-                                    <div style={{height: 1, backgroundColor: "#808080", width: "100%", marginTop: 5, marginBottom: 5}}/>
+                                    {/* <div style={{height: 1, backgroundColor: "#808080", width: "100%", marginTop: 5, marginBottom: 5}}/>
                                     <MDBDropdownItem style={{padding: 5, paddingLeft: 10}}  onClick={
                                         () => {
                                             const newBlocks = [...blocks];
@@ -772,7 +772,7 @@ Adding a ? before a function, eg ?Drive.Right(tiles, speed); will make it run in
                                         }
                                     }>
                                         <span style={{color: "white"}}>Sunny Park</span>
-                                    </MDBDropdownItem>
+                                    </MDBDropdownItem> */}
                                     <div style={{height: 1, backgroundColor: "#808080", width: "100%", marginTop: 5, marginBottom: 5}}/>
                                     <MDBDropdownItem style={{padding: 5, paddingLeft: 10}} onClick={
                                         () => {
