@@ -3,6 +3,7 @@ import {
     MDBBtn,
     MDBBtnGroup,
     MDBCol,
+    MDBCollapse,
     MDBContainer,
     MDBDropdown,
     MDBDropdownItem,
@@ -17,6 +18,12 @@ import {
     MDBModalDialog,
     MDBModalHeader,
     MDBModalTitle,
+    MDBNavbar,
+    MDBNavbarBrand,
+    MDBNavbarItem,
+    MDBNavbarLink,
+    MDBNavbarNav,
+    MDBNavbarToggler,
     MDBRow,
     MDBScrollbar,
     MDBTabs,
@@ -48,6 +55,8 @@ function App() {
     }, [blocks]);
 
     const [mode, setMode] = React.useState("Line Code");
+
+    const [showNav, setShowNav] = React.useState(false);
 
     const [showLineCodeDocs, setShowLineCodeDocs] = React.useState(false);
 
@@ -344,6 +353,29 @@ function App() {
         <div
             style={{ backgroundColor: "#121212", color: "#f5f7ff", width: "100%", height: "100%" }}
         >
+            <MDBNavbar style={{position: "absolute", width: "100%", top:0, left: 0}} expand='lg' dark bgColor='none'>
+                <MDBContainer fluid>
+                    <MDBNavbarBrand href='#'>Cowlang IDE</MDBNavbarBrand>
+                    <MDBNavbarToggler
+                    type='button'
+                    aria-expanded='false'
+                    aria-label='Toggle navigation'
+                    onClick={() => setShowNav(!showNav)}
+                    >
+                    <MDBIcon icon='bars' fas />
+                    </MDBNavbarToggler>
+                    <MDBCollapse navbar show={showNav}>
+                    <MDBNavbarNav className='d-flex w-auto'>
+                        <MDBNavbarItem>
+                        <MDBNavbarLink href='https://argonautsftc.org'>By FTC21630</MDBNavbarLink>
+                        </MDBNavbarItem>
+                        <MDBNavbarItem>
+                        <MDBNavbarLink href='https://github.com/RPS-Argonauts-FTC/Cowlang-IDE' target='_blank'>GitHub</MDBNavbarLink>
+                        </MDBNavbarItem>
+                    </MDBNavbarNav>
+                    </MDBCollapse>
+                </MDBContainer>
+                </MDBNavbar>
             <div
                 className="d-flex justify-content-center"
                 style={{ height: "100vh" }}
